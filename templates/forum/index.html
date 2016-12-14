@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load comments %}
+{% load notifications_tags %}
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group">
@@ -72,7 +73,10 @@
                     <a href="{% url 'forum:create' %}"><i class="fa fa-pencil" aria-hidden="true"></i> 创作新主题</a>
                 </li>
                 <li class="list-group-item">
-                    <a href="{% url 'notifications:all' %}"><i class="fa fa-bell" aria-hidden="true"></i> 0 条未读提醒</a>
+                    {% notifications_unread as unread_count %}
+                    <a href="{% url 'notifications:all' %}" {% if unread_count %}style="color: red"{% endif %}><i
+                            class="fa fa-bell"
+                            aria-hidden="true"></i> {{ unread_count }} 条未读提醒</a>
                 </li>
             </ul>
         {% else %}

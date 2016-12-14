@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-commingsone
-</body>
-</html>
+{% extends 'base.html' %}
+{% block main %}
+    <main class="col-md-8">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <nav>
+                    <a href="{% url 'forum:index' %}">django 中文社区</a> >
+                    <a>通知</a>
+                    <a href="{% url 'notifications:mark_all_as_read' %}"
+                       class="btn btn-sm btn-outline-info pull-right">全部标为已读</a>
+                </nav>
+            </li>
+            {% for notification in notifications %}
+                <li class="list-group-item clearfix {% if notification.unread %}bg-faded{% endif %}">
+                    {{ notification.description|safe }}
+                    <ul class="list-inline text-muted pull-right" style="margin-top: 5px">
+                        <li class="list-inline-item">
+                            <time class="small">{{ notification.timestamp|timesince }}前</time>
+                        </li>
+                        <li class="list-inline-item"><a href="{% url 'notifications:mark_as_read' notification.slug %}"
+                                                        class="tag tag-info">标为已读</a></li>
+                        <li class="list-inline-item"><a href="{% url 'notifications:delete' notification.slug %}"
+                                                        class="tag tag-danger">删除</a></li>
+                    </ul>
+                </li>
+            {% empty %}
+                <li class="list-group-item">
+                    <span class="">暂无通知</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock main %}
