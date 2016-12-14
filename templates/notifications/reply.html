@@ -1,0 +1,18 @@
+<div class="media">
+    <a class="media-left" href="{{ user.get_absolute_url }}">
+        <img class="media-object" src="{{ user.mugshot_thumbnail.url }}"
+             alt="" style="width: 24px;">
+    </a>
+    <div class="media-body">
+        <div class="media-heading">
+            用户 <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a>
+            在你发布的帖子
+            <a href="{{ post.get_absolute_url }}#c{{ reply.pk }}">{{ post.title }}</a>
+            中回复了你:
+        </div>
+        <mark>
+            {{ content }}
+        </mark>
+    </div>
+</div>
+

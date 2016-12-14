@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load comments %}
+{% block style %}
+    <style>
+        #div_id_honeypot {
+            display: none;
+        }
+    </style>
+{% endblock style %}
+{% block main %}
+    <main class="col-md-8">
+        <div class="card">
+            <nav class="card-header">
+                <a href="{% url 'forum:index' %}">django 中文社区</a> >
+                {% with ancestors=post.category.get_ancestors %}
+                    {% if ancestors %}
+                        {% for ancestor in ancestors %}
+                            <a href="">{{ ancestor }}</a> >
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <a href="">{{ post.category }}</a>
+            </nav>
+            <div class="card-block">
+                <a href="{{ post.author.get_absolute_url }}" class="pull-right"><img
+                        src="{{ post.author.mugshot_thumbnail.url }}"
+                        style="width: 73px;"></a>
+
+                <h3>{{ post.title }}</h3>
+                <ul class="list-inline text-muted small">
+                    <li class="list-inline-item"><a
+                            href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <time>{{ post.created|timesince }}前</time>
+                    </li>
+                    <li class="list-inline-item">{{ post.views }} 次点击</li>
+                </ul>
+                {% if  post.body %}
+                    <hr>
+                    <div>
+                        {{ post.body }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <ul class="list-group mb-1">
+            <li class="list-group-item small text-muted"><span>{{ post.replies.count }} 回复</span> |
+                <span>直到 {{ post.latest_reply.submit_date }}</span></li>
+            {% for reply in post.replies.all %}
+                <li class="list-group-item" id="c{{ reply.pk }}">
+                    <div class="media">
+                        <a class="media-left" href="{{ reply.user.get_absolute_url }}">
+                            <img class="media-object" src="{{ reply.user.mugshot_thumbnail.url }}" alt=""
+                                 style="width: 48px;">
+                        </a>
+                        <div class="media-body">
+                            <ul class="list-inline text-muted small">
+                                <li class="list-inline-item"><a
+                                        href="{{ reply.user.get_absolute_url }}"><strong>{{ reply.user.nickname }}</strong></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <time>{{ reply.submit_date|timesince }}前</time>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="">回复</a>
+                                </li>
+                                <li class="pull-right">{{ forloop.counter }} 楼</li>
+                            </ul>
+                            <div class="">
+                                {{ reply.comment }}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="card">
+            <div class="card-header">添加一条新回复</div>
+            <div class="card-block">
+                {% if user.is_authenticated %}
+                    {% render_comment_form for post %}
+                {% else %}
+                    <a href="{% url 'account_login' %}">登录</a>以回复
+                {% endif %}
+            </div>
+        </div>
+    </main>
+{% endblock main %}
+
+{% block aside %}
+    <aside class="col-md-4">
+        {% if user.is_authenticated %}
+            <ul class="list-group mb-2">
+                <li class="list-group-item">
+                    <div class="media">
+                        <a class="media-left" href="#">
+                            <img class="media-object" src="{{ user.mugshot.url }}"
+                                 alt="Generic placeholder image"
+                                 style="width: 48px;">
+                        </a>
+                        <div class="media-body media-middle">
+                            <a href="">{{ user.nickname }}</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <a href=""><i class="fa fa-pencil" aria-hidden="true"></i> 创作新主题</a>
+                </li>
+                <li class="list-group-item">
+                    <a href=""><i class="fa fa-bell" aria-hidden="true"></i> 0 条未读提醒</a>
+                </li>
+            </ul>
+        {% else %}
+            <div class="card card-block">
+                <h3 class="card-title">django 中文社区</h3>
+                <hr>
+                <div class="text-lg-center">
+                    <button class="btn btn-outline-info btn-sm"><a href="{% url 'account_signup' %}">现在注册</a></button>
+                    <p>
+                        已注册用户请<a href="{% url 'account_login' %}">登录</a>
+                    </p>
+                </div>
+            </div>
+
+
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <h3 class="list-group-item-heading">今日热议主题</h3>
+                </li>
+                <li class="list-group-item">
+                    <div class="media">
+                        <a class="media-left" href="#">
+                            <img class="media-object" src="{% static 'forum/images/avatar.png' %}"
+                                 alt="Generic placeholder image"
+                                 style="width: 24px;">
+                        </a>
+                        <div class="media-body">
+                            <h6 class="media-heading"><a href="">哎,putty 官方也被墙了,话说 Bitvise 跟 putty 有什么关系?基于 putty
+                                源码重新开发编译的?</a></h6>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            </aside>
+        {% endif %}
+{% endblock aside %}

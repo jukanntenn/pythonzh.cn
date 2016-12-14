@@ -1,0 +1,70 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="{% static 'forum/css/bootstrap.min.css' %}">
+    <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <title>django 中文社区 - 国内的 django 开发者都在这</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+    {% block style %}
+    {% endblock style %}
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-light mb-2" style="background-color: #fff">
+        <div class="container">
+            <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse"
+                    data-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"></button>
+            <div class="collapse navbar-toggleable-md" id="navbarResponsive">
+                <a class="navbar-brand" href="{% url 'forum:index' %}">django 中文社区</a>
+                <form class="form-inline float-lg-left">
+                    <input class="form-control" type="text" placeholder="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                <ul class="nav navbar-nav float-lg-right">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'forum:index' %}">首页 <span class="sr-only">(current)</span></a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">设置</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_logout' %}?next={{ request.path }}">登出</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_signup' %}?next={{ request.path }}">注册</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {% block content %}
+            <div class="row">
+                {% block main %}
+                {% endblock main %}
+                {% block aside %}
+                {% endblock aside %}
+            </div>
+        {% endblock content %}
+    </div>
+
+</header>
+<script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+<script src="{% static 'forum/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

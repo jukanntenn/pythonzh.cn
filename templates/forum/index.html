@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load comments %}
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="" class="">django</a></li>
+                </ul>
+                <ul class="list-inline text-muted small">
+                    <li class="list-inline-item"><a href=""
+                                                    class="">django 博客教程</a></li>
+                </ul>
+            </li>
+            {% for post in post_list %}
+                <li class="list-group-item">
+                    <div class="media">
+                        <a class="media-left" href="{{ post.author.get_absolute_url }}">
+                            <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
+                                 alt="" style="width: 48px;">
+                        </a>
+                        <div class="media-body">
+                            <h5 class="media-heading"><a href="{% url 'forum:detail' post.slug %}">{{ post.title }}</a>
+                            </h5>
+                            <ul class="list-inline text-muted small">
+                                <li class="list-inline-item"><a href="" class="tag tag-default">{{ post.category }}</a>
+                                </li>
+                                <li class="list-inline-item"><a
+                                        href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <time>{{ post.created|timesince }}前</time>
+                                </li>
+                                {% if post.latest_reply %}
+                                    <li class="list-inline-item">最后回复来自 <a
+                                            href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% get_comment_count for post as reply_count %}
+                        {% if reply_count %}
+                            <div class="media-right media-middle">
+                                <a href="" class="tag tag-default tag-pill">{{ reply_count }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock main %}
+
+{% block aside %}
+    <aside class="col-md-4">
+        {% if user.is_authenticated %}
+            <ul class="list-group mb-2">
+                <li class="list-group-item">
+                    <div class="media">
+                        <a class="media-left" href="{{ user.get_absolute_url }}">
+                            <img class="media-object" src="{{ user.mugshot.url }}"
+                                 alt="Generic placeholder image"
+                                 style="width: 48px;">
+                        </a>
+                        <div class="media-body media-middle">
+                            <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'forum:create' %}"><i class="fa fa-pencil" aria-hidden="true"></i> 创作新主题</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'notifications:all' %}"><i class="fa fa-bell" aria-hidden="true"></i> 0 条未读提醒</a>
+                </li>
+            </ul>
+        {% else %}
+            <div class="card card-block">
+                <h3 class="card-title">django 中文社区</h3>
+                <hr>
+                <div class="text-lg-center">
+                    <button class="btn btn-outline-info btn-sm"><a
+                            href="{% url 'account_signup' %}?next={{ request.path }}">现在注册</a></button>
+                    <p>
+                        已注册用户请<a href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        <ul class="list-group">
+            <li class="list-group-item">
+                <h3 class="list-group-item-heading">今日热议主题</h3>
+            </li>
+            <li class="list-group-item">
+                <div class="media">
+                    <a class="media-left" href="#">
+                        <img class="media-object" src="{% static 'forum/images/avatar.png' %}"
+                             alt="Generic placeholder image"
+                             style="width: 24px;">
+                    </a>
+                    <div class="media-body">
+                        <h6 class="media-heading"><a href="">哎,putty 官方也被墙了,话说 Bitvise 跟 putty 有什么关系?基于 putty
+                            源码重新开发编译的?</a></h6>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </aside>
+{% endblock aside %}

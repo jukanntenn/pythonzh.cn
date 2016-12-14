@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% block main %}
+    <div class="col-md-8">
+        <div class="card card-block">
+            <h3 class="card-title">修改个人资料
+            </h3>
+            <hr>
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock main %}
+{% block aside %}
+    <aside class="col-md-4">
+        <ul class="list-group mb-2">
+            <li class="list-group-item">
+                <div class="media">
+                    <a class="media-left" href="#">
+                        <img class="media-object" src="{% static 'forum/images/avatar.png' %}"
+                             alt="Generic placeholder image"
+                             style="width: 48px;">
+                    </a>
+                    <div class="media-body media-middle">
+                        <a href="">{{ user.nickname }}</a>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <a href=""><i class="fa fa-pencil" aria-hidden="true"></i> 创作新主题</a>
+            </li>
+            <li class="list-group-item">
+                <a href=""><i class="fa fa-bell" aria-hidden="true"></i> 0 条未读提醒</a>
+            </li>
+        </ul>
+    </aside>
+{% endblock aside %}
