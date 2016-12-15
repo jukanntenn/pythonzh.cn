@@ -25,7 +25,7 @@ class ReplyModerator(CommentModerator):
             def mark(mo):
                 nickname = mo.group(1)
                 user = users.get(nickname=nickname)
-                return '[%s](%s)' % (nickname, user.get_absolute_url())
+                return '@[%s](%s)' % (nickname, user.get_absolute_url())
 
             pattern = '@(%s)' % ('|'.join(u.nickname for u in users))
             reply.comment = re.sub(pattern, mark, reply.comment)
