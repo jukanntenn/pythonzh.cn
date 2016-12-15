@@ -1,4 +1,5 @@
 from django import forms
+from django.core import urlresolvers
 
 from allauth.account.forms import (
     LoginForm as AllAuthLoginForm,
@@ -33,6 +34,7 @@ class UserProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
+        self.helper.form_action = urlresolvers.reverse('users:profile_change')
         self.helper.add_input(Submit('submit', '确认修改'))
 
     class Meta:
@@ -49,4 +51,5 @@ class MugshotForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
+        self.helper.form_action = urlresolvers.reverse('users:mugshot_change')
         self.helper.add_input(Submit('submit', '开始上传'))

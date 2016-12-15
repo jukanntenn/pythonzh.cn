@@ -35,7 +35,7 @@
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">设置</a>
+                            <a class="nav-link" href="{% url 'users:profile' %}">设置</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'account_logout' %}?next={{ request.path }}">登出</a>

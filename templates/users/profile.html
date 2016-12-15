@@ -4,8 +4,8 @@
     <main class="col-md-8 mb-1">
         <div class="card card-block">
             <h3 class="card-title">个人资料
-                <small><a href="{% url 'users:profile_change' user.username %}"><i class="fa fa-pencil-square-o"
-                                                                                   aria-hidden="true"></i> 修改</a>
+                <small><a href="{% url 'users:profile_change' %}"><i class="fa fa-pencil-square-o"
+                                                                     aria-hidden="true"></i> 修改</a>
                 </small>
             </h3>
             <hr>
@@ -31,7 +31,7 @@
             <img src="{{ user.mugshot.url }}" alt="Generic placeholder image"
                  style="width: 96px;">
             <div>
-                <button class="btn btn-info btn-sm"><a href="{% url 'users:mugshot_change' user.username %}">上传新头像</a>
+                <button class="btn btn-info btn-sm"><a href="{% url 'users:mugshot_change' %}">上传新头像</a>
                 </button>
             </div>
         </div>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% load comments %}
+
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <ul class="list-group mb-1">
+            <li class="list-group-item">
+                <span class="pull-right">回复总数 {{ reply_list.count }}</span>
+                <nav>
+                    <a href="{% url 'forum:index' %}">django 中文社区</a> >
+                    <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >
+                    <a>全部回复</a>
+                </nav>
+            </li>
+            {% for reply in reply_list %}
+                <li class="list-group-item clearfix">
+                    <div class="" style="margin-bottom: 8px">
+                        回复了 <a
+                            href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
+                        创建的主题 › <a
+                            href="{{ reply.content_object.get_absolute_url }}">{{ reply.content_object.title }}</a>
+                    </div>
+                    <div class="mark">
+                        {{ reply.comment }}
+                    </div>
+                    <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock main %}

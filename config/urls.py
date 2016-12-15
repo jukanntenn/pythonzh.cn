@@ -23,9 +23,8 @@ from users import views
 urlpatterns = [
     url('', include('forum.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/', include('allauth.account.urls')),
-    url(r'^accounts/profile/$', views.UserProfileView.as_view(), name='profile'),
-    url(r'^notifications/', include('notifications.urls',namespace='notifications')),
+    url(r'^users/', include('allauth.account.urls')),
+    url(r'^notifications/', include('notifications.urls', namespace='notifications')),
     url(r'^replies/', include('django_comments.urls')),
     url(r'^replies/', include('replies.urls')),
     url(r'^users/', include('users.urls')),

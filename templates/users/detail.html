@@ -1,10 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-comming soon
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% load comments %}
+
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <div class="card card-block">
+            <div class="media">
+                <div class="media-left">
+                    <img class="media-object" src="{{ user.mugshot_thumbnail.url }}" alt=""
+                         style="width: 73px;">
+                </div>
+                <div class="media-body">
+                    <h3 class="media-heading">{{ user.nickname }}</h3>
+                    <div>django 中文社区第 {{ user.pk }} 号会员，加入于 {{ user.date_joined }}</div>
+                </div>
+            </div>
+        </div>
+        <ul class="list-group mb-1">
+            <li class="list-group-item">
+                {{ user.nickname }} 发布的所有帖子
+            </li>
+            {% for post in post_list %}
+                <li class="list-group-item">
+                    <div class="media">
+                        <div class="media-body">
+                            <h5 class="media-heading"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h5>
+                            <ul class="list-inline text-muted small">
+                                <li class="list-inline-item"><a href="" class="tag tag-default">{{ post.category }}</a>
+                                </li>
+                                <li class="list-inline-item"><a
+                                        href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <time>{{ post.created|timesince }}前</time>
+                                </li>
+                                <li class="list-inline-item">最后回复来自 <a
+                                        href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% get_comment_count for post as reply_count %}
+                        {% if reply_count %}
+                            <div class="media-right media-middle">
+                                <a href="" class="tag tag-default tag-pill">{{ reply_count }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+            <li class="list-group-item small"><a href="{% url 'users:posts' user.username %}"
+                                                 class="text-muted">{{ user.nickname }}
+                发布的更多帖子>></a></li>
+        </ul>
+        <ul class="list-group">
+            <li class="list-group-item">
+                {{ user.nickname }} 最近回复了
+            </li>
+            {% for reply in reply_list %}
+                <li class="list-group-item clearfix">
+                    <div class="" style="margin-bottom: 8px">
+                        回复了 <a
+                            href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
+                        创建的主题 › <a
+                            href="{{ reply.content_object.get_absolute_url }}">{{ reply.content_object.title }}</a>
+                    </div>
+                    <div class="mark">
+                        {{ reply.comment }}
+                    </div>
+                    <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
+                </li>
+            {% endfor %}
+            <li class="list-group-item small"><a href="{% url 'users:replies' user.username %}"
+                                                 class="text-muted">{{ user.nickname }}
+                创建的更多回复>></a></li>
+        </ul>
+    </main>
+{% endblock main %}

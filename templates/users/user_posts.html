@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load comments %}
+
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <ul class="list-group mb-1">
+            <li class="list-group-item">
+                <span class="pull-right">帖子总数 {{ post_list.count }}</span>
+                <nav>
+                    <a href="{% url 'forum:index' %}">django 中文社区</a> >
+                    <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >
+                    <a>全部帖子</a>
+                </nav>
+            </li>
+            {% for post in post_list %}
+                <li class="list-group-item">
+                    <div class="media">
+                        <div class="media-body">
+                            <h5 class="media-heading"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h5>
+                            <ul class="list-inline text-muted small">
+                                <li class="list-inline-item"><a href="" class="tag tag-default">{{ post.category }}</a>
+                                </li>
+                                <li class="list-inline-item"><a
+                                        href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <time>{{ post.created|timesince }}前</time>
+                                </li>
+                                <li class="list-inline-item">最后回复来自 <a
+                                        href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% get_comment_count for post as reply_count %}
+                        {% if reply_count %}
+                            <div class="media-right media-middle">
+                                <a href="" class="tag tag-default tag-pill">{{ reply_count }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock main %}
