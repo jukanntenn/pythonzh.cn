@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load comments %}
+{% load forum_tags %}
 {% block style %}
     <style>
         #div_id_honeypot {
@@ -40,7 +41,7 @@
                 {% if  post.body %}
                     <hr>
                     <div>
-                        {{ post.body }}
+                        {{ post.body_html|bleach }}
                     </div>
                 {% endif %}
             </div>
@@ -58,18 +59,19 @@
                         <div class="media-body">
                             <ul class="list-inline text-muted small">
                                 <li class="list-inline-item"><a
-                                        href="{{ reply.user.get_absolute_url }}"><strong>{{ reply.user.nickname }}</strong></a>
+                                        href="{{ reply.user.get_absolute_url }}"><strong
+                                        class="nickname">{{ reply.user.nickname }}</strong></a>
                                 </li>
                                 <li class="list-inline-item">
                                     <time>{{ reply.submit_date|timesince }}前</time>
                                 </li>
                                 <li class="list-inline-item">
-                                    <a href="">回复</a>
+                                    <a href="javascript:" class="reply_btn">回复</a>
                                 </li>
                                 <li class="pull-right">{{ forloop.counter }} 楼</li>
                             </ul>
                             <div class="">
-                                {{ reply.comment }}
+                                {{ reply.reply_html|bleach }}
                             </div>
                         </div>
                     </div>
@@ -146,3 +148,15 @@
             </aside>
         {% endif %}
 {% endblock aside %}
+
+
+{% block script %}
+    <script>
+        $('.reply_btn').on('click', function () {
+            var $this = $(this);
+            var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
+            var $replyArea = $('#div_id_comment').find('.textarea').first();
+            $replyArea.val($replyArea.val() + $nickname).focus()
+        })
+    </script>
+{% endblock script %}

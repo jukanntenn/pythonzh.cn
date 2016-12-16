@@ -150,3 +150,17 @@ ACCOUNT_FORMS = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.codehilite',
+    'markdown.extensions.toc',
+]
+
+MARKDOWN_EXTENSION_CONFIGS = {}
+
+BLEACH_ALLOWED_TAGS = ['a', 'img', 'br', 'strong', 'b', 'code', 'pre',
+                       'p', 'div', 'dl', 'dt', 'dd', 'em', 'span', 'h1', 'h2', 'h3', 'h4',
+                       'h5', 'h6', 'blockquote', 'ul', 'ol', 'tr', 'th', 'td',
+                       'hr', 'li', 'u', 'embed', 's', 'table', 'thead', 'tbody',
+                       'caption', 'small', 'q', 'sup', 'sub', ]

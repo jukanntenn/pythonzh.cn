@@ -14,5 +14,9 @@ class CategoryPostView(DetailView):
         post_list = Post.objects.filter(category__slug=self.kwargs.get('slug')).annotate(
             latest_reply_time=Max('replies__submit_date')).order_by('-pinned',
                                                                     '-latest_reply_time')
-        context['post_list'] = post_list
+        category_ancestors = self.object.get_ancestors()
+        context.update({
+            'post_list': post_list,
+            'category_ancestors': category_ancestors
+        })
         return context

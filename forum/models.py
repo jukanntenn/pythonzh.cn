@@ -8,6 +8,7 @@ from taggit.managers import TaggableManager
 from autoslug import AutoSlugField
 
 from replies.models import Reply
+from .mark import markdownify
 
 
 class Post(TimeStampedModel, SoftDeletableModel):
@@ -35,3 +36,6 @@ class Post(TimeStampedModel, SoftDeletableModel):
     @property
     def latest_reply(self):
         return self.replies.latest('submit_date')
+
+    def body_html(self):
+        return markdownify(self.body)

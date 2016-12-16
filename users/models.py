@@ -35,7 +35,6 @@ class User(AbstractUser):
             self.nickname = self.username
 
         if not self.mugshot:
-            print('I involked')
             avatar = Avatar(rows=10, columns=10)
             image_byte_array = avatar.get_image(string=self.username,
                                                 width=480,

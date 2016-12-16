@@ -32,9 +32,8 @@ class MugshotChangeView(LoginRequiredMixin, UpdateView):
             self.request.user.mugshot.delete(save=False)
         return super().form_valid(form)
 
-    # TODO: Can't update mugshot correctly
     def get_object(self, queryset=None):
-        return self.request.user
+        return User.objects.get(pk=self.request.user.pk)
 
 
 class UserDetailView(DetailView):
