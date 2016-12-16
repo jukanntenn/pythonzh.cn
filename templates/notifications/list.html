@@ -17,8 +17,11 @@
                         <li class="list-inline-item">
                             <time class="small">{{ notification.timestamp|timesince }}前</time>
                         </li>
-                        <li class="list-inline-item"><a href="{% url 'notifications:mark_as_read' notification.slug %}"
-                                                        class="tag tag-info">标为已读</a></li>
+                        {% if notification.unread %}
+                            <li class="list-inline-item"><a
+                                    href="{% url 'notifications:mark_as_read' notification.slug %}"
+                                    class="tag tag-info">标为已读</a></li>
+                        {% endif %}
                         <li class="list-inline-item"><a href="{% url 'notifications:delete' notification.slug %}"
                                                         class="tag tag-danger">删除</a></li>
                     </ul>

@@ -10,6 +10,7 @@ from .forms import PostCreationForm
 
 
 class IndexView(ListView):
+    paginate_by = 10
     model = Post
     template_name = 'forum/index.html'
 

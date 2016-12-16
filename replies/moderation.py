@@ -2,10 +2,12 @@ import re
 
 from django_comments.moderation import CommentModerator, Moderator as DjangoCommentModerator
 from django.template.loader import render_to_string
+from django.utils.html import mark_safe
 
 from notifications.signals import notify
 
 from users.models import User
+from forum.mark import markdownify
 
 
 class Moderator(DjangoCommentModerator):
@@ -37,7 +39,7 @@ class ReplyModerator(CommentModerator):
                     'user': reply.user,
                     'post': content_object,
                     'reply': reply,
-                    'content': reply.comment
+                    'content': mark_safe(markdownify(reply.comment))
                 })
                 data = {
                     'recipient': recipient,
@@ -53,7 +55,7 @@ class ReplyModerator(CommentModerator):
                 'user': reply.user,
                 'post': content_object,
                 'reply': reply,
-                'content': reply.comment
+                'content': mark_safe(markdownify(reply.comment))
             })
             data = {
                 'recipient': content_object.author,

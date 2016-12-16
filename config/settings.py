@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'replies',
     'categories',
     'covers',
+    'bootstrap_pagination',
 ]
 
 COMMENTS_APP = 'replies'
@@ -164,3 +165,6 @@ BLEACH_ALLOWED_TAGS = ['a', 'img', 'br', 'strong', 'b', 'code', 'pre',
                        'h5', 'h6', 'blockquote', 'ul', 'ol', 'tr', 'th', 'td',
                        'hr', 'li', 'u', 'embed', 's', 'table', 'thead', 'tbody',
                        'caption', 'small', 'q', 'sup', 'sub', ]
+
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/users/login/'
