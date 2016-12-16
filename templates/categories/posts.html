@@ -27,6 +27,17 @@
                     </div>
                 </div>
             </li>
+            {% if category.children.count %}
+                <li class="list-group-item  bg-faded">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><span class="">子分类：</span></li>
+                        {% for c in category.children.all %}
+                            <li class="list-inline-item"><a href="{% url 'categories:posts' c.slug %}"
+                                                            class="tag tag-default">{{ c }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
             {% for post in post_list %}
                 <li class="list-group-item">
                     <div class="media">

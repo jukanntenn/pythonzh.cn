@@ -8,11 +8,21 @@
         <ul class="list-group">
             <li class="list-group-item">
                 <ul class="list-inline">
-                    <li class="list-inline-item"><a href="" class="">django</a></li>
+                    <li class="list-inline-item"><a href="{% url 'forum:index' %}" class="btn btn-sm btn-success">全部</a>
+                    </li>
+                    {% get_categories as category_list %}
+                    {% for category in  category_list %}
+                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                                                        class="btn btn-sm btn-outline-success">{{ category }}</a></li>
+                    {% endfor %}
                 </ul>
-                <ul class="list-inline text-muted small">
-                    <li class="list-inline-item"><a href=""
-                                                    class="">django 博客教程</a></li>
+                <ul class="list-inline text-muted" style="margin-top: 8px">
+                    快速浏览：
+                    {% get_quick_categories as quick_categoriy_list %}
+                    {% for category in quick_categoriy_list %}
+                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                                                        class="tag tag-default">{{ category }}</a></li>
+                    {% endfor %}
                 </ul>
             </li>
             {% for post in post_list %}
