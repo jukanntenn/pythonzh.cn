@@ -42,6 +42,9 @@ class UserProfileForm(forms.ModelForm):
         self.helper.form_action = urlresolvers.reverse('users:profile_change')
         self.helper.add_input(Submit('submit', '确认修改'))
 
+        self.fields['nickname'].label = '昵称'
+        self.fields['signature'].label = '个性签名'
+
     class Meta:
         model = User
         fields = ('nickname', 'signature')
@@ -56,5 +59,7 @@ class MugshotForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
+        self.helper.form_class = 'mt-1'
         self.helper.form_action = urlresolvers.reverse('users:mugshot_change')
         self.helper.add_input(Submit('submit', '开始上传'))
+        self.fields['mugshot'].label = '头像'

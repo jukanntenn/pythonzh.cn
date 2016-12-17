@@ -6,7 +6,7 @@
     <main class="col-md-8 mb-1">
         <ul class="list-group mb-1">
             <li class="list-group-item">
-                <span class="pull-right">回复总数 {{ reply_list.count }}</span>
+                <span class="pull-right">回复总数 {{ paginator.count }}</span>
                 <nav>
                     <a href="{% url 'forum:index' %}">django 中文社区</a> >
                     <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >

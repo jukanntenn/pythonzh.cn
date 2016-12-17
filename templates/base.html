@@ -8,10 +8,14 @@
     <link rel="stylesheet" href="{% static 'forum/css/bootstrap.min.css' %}">
     <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'forum/css/friendly.css' %}">
-    <title>django 中文社区 - 国内的 django 开发者都在这</title>
+    <title>Python 中文社区 - 国内的 Python 开发者都在这</title>
     <style>
         body {
             background-color: #f8f9fa;
+        }
+
+        .asteriskField {
+            color: red;;
         }
     </style>
     {% block style %}
@@ -71,6 +75,7 @@
 
 </header>
 <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/tether/1.4.0/js/tether.min.js"></script>
 <script src="{% static 'forum/js/bootstrap.min.js' %}"></script>
 {% block script %}
 {% endblock script %}

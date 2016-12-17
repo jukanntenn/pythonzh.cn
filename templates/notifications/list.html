@@ -24,8 +24,9 @@
                                     href="{% url 'notifications:mark_as_read' notification.slug %}"
                                     class="tag tag-info">标为已读</a></li>
                         {% endif %}
-                        <li class="list-inline-item"><a href="{% url 'notifications:delete' notification.slug %}"
-                                                        class="tag tag-danger">删除</a></li>
+                        <li class="list-inline-item">
+                            <a href="{% url 'notifications:delete' notification.slug %}"
+                               class="tag tag-danger">删除</a></li>
                     </ul>
                 </li>
             {% empty %}
