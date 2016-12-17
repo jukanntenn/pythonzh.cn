@@ -16,7 +16,7 @@
                     </a>
                     <div class="media-body">
                         <nav class="media-heading">
-                            <a href="{% url 'forum:index' %}">Python 中文社区</a> >
+                            <a href="{% url 'forum:index' %}">django forum demo</a> >
                             {% for category in category_ancestors %}
                                 <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a> >
                             {% endfor %}

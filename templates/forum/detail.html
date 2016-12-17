@@ -13,7 +13,7 @@
     <main class="col-md-8">
         <div class="card">
             <nav class="card-header">
-                <a href="{% url 'forum:index' %}">Python 中文社区</a> >
+                <a href="{% url 'forum:index' %}">django forum demo</a> >
                 {% with ancestors=post.category.get_ancestors %}
                     {% if ancestors %}
                         {% for ancestor in ancestors %}

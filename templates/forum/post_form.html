@@ -5,7 +5,7 @@
     <main class="col-md-8">
         <div class="card">
             <nav class="card-header">
-                <a href="{% url 'forum:index' %}">Python 中文社区</a>
+                <a href="{% url 'forum:index' %}">django forum demo</a>
                 >
                 {% if category %}
                     <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a>
