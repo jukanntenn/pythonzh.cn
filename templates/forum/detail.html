@@ -84,7 +84,7 @@
                 {% if user.is_authenticated %}
                     {% render_comment_form for post %}
                 {% else %}
-                    <a href="{% url 'account_login' %}">登录</a>以回复
+                    <a href="{% url 'account_login' %}?next={{ request.path }}">登录</a>以回复
                 {% endif %}
             </div>
         </div>

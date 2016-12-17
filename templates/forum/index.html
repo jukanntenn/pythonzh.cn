@@ -17,14 +17,17 @@
                                                         class="btn btn-sm btn-outline-success">{{ category }}</a></li>
                     {% endfor %}
                 </ul>
-                <ul class="list-inline text-muted" style="margin-top: 16px">
-                    快速浏览：
-                    {% get_quick_categories as quick_categoriy_list %}
-                    {% for category in quick_categoriy_list %}
-                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
-                                                        class="tag tag-default">{{ category }}</a></li>
-                    {% endfor %}
-                </ul>
+                {% get_quick_categories as quick_categoriy_list %}
+                {% if quick_categoriy_list %}
+                    <ul class="list-inline text-muted" style="margin-top: 16px">
+                        快速浏览：
+
+                        {% for category in quick_categoriy_list %}
+                            <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                                                            class="tag tag-default">{{ category }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </li>
             {% for post in post_list %}
                 <li class="list-group-item">
@@ -63,8 +66,12 @@
                         {% endif %}
                     </div>
                 </li>
+            {% empty %}
+                <li class="list-group-item">暂无帖子</li>
             {% endfor %}
-            {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% if post_list and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}
