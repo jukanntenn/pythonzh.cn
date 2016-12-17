@@ -3,6 +3,7 @@
 {% load comments %}
 {% load notifications_tags %}
 {% load forum_tags %}
+{% load bootstrap_pagination %}
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group">
@@ -25,7 +26,7 @@
                             {{ category.description }}
                         </div>
                         <button class="btn btn-sm btn-outline-primary" style="margin-top: 8px"><a
-                                href="{% url 'forum:create' %}">发布新帖子</a>
+                                href="{% url 'forum:create' category.slug %}">发布新帖子</a>
                         </button>
                     </div>
                 </div>
@@ -41,7 +42,7 @@
                     </ul>
                 </li>
             {% endif %}
-            {% for post in post_list %}
+            {% for post in page_obj %}
                 <li class="list-group-item">
                     <div class="media">
                         <a class="media-left" href="{{ post.author.get_absolute_url }}">
@@ -76,7 +77,12 @@
                         {% endif %}
                     </div>
                 </li>
+            {% empty %}
+                <li class="list-group-item">暂无帖子</li>
             {% endfor %}
+            {% if post_list.count and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}

@@ -18,6 +18,15 @@ class PostCreationForm(forms.ModelForm):
         self.helper.form_action = 'forum:create'
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', '发布'))
+        self.fields['title'].label = '标题'
+        self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
+        self.fields['body'].label = '正文'
+        self.fields['body'].help_text = '支持 Markdown 语法标记'
+        self.fields['category'].label = '分类'
+        self.fields['category'].help_text = '选择帖子分类'
+
+        if self.initial.get('category'):
+            self.fields['category'].widget = forms.HiddenInput()
 
     def save(self, commit=True):
         self.instance.author = self.user

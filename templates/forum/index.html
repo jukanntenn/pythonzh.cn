@@ -29,7 +29,7 @@
                     </ul>
                 {% endif %}
             </li>
-            {% for post in post_list %}
+            {% for post in page_obj %}
                 <li class="list-group-item">
                     <div class="media">
                         <a class="media-left" href="{{ post.author.get_absolute_url }}">

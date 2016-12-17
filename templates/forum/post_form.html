@@ -7,7 +7,11 @@
             <nav class="card-header">
                 <a href="{% url 'forum:index' %}">django 中文社区</a>
                 >
-                <a>创作新主题</a>
+                {% if category %}
+                    <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a>
+                    >
+                {% endif %}
+                <a>发布新帖子</a>
             </nav>
             <div class="card-block">
                 {% crispy form %}
