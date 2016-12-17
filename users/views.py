@@ -51,6 +51,7 @@ class UserDetailView(DetailView):
 
 
 class UserPostListView(ListView):
+    paginate_by = 10
     model = Post
     template_name = 'users/user_posts.html'
 
@@ -65,6 +66,7 @@ class UserPostListView(ListView):
 
 
 class UserReplyListView(ListView):
+    paginate_by = 10
     model = Reply
     template_name = 'users/user_replies.html'
 

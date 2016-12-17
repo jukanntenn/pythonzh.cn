@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max
 from django.db.models.functions import Coalesce
+from notifications.views import AllNotificationsList
 
 from braces.views import UserFormKwargsMixin
 
@@ -30,6 +31,11 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'forum/detail.html'
 
+    def get(self, request, *args, **kwargs):
+        response = super(PostDetailView, self).get(request, *args, **kwargs)
+        self.object.increase_views()
+        return response
+
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     form_class = PostCreationForm
@@ -54,3 +60,7 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
         category = get_object_or_404(Category, slug=slug)
         context['category'] = category
         return context
+
+
+class NotificationsListView(AllNotificationsList):
+    paginate_by = 10

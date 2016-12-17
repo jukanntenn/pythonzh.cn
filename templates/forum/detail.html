@@ -21,7 +21,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <a href="">{{ post.category }}</a>
+                <a href="{% url 'categories:posts' post.category.slug %}">{{ post.category }}</a>
             </nav>
             <div class="card-block">
                 <a href="{{ post.author.get_absolute_url }}" class="pull-right"><img
@@ -38,7 +38,7 @@
                     </li>
                     <li class="list-inline-item">{{ post.views }} 次点击</li>
                 </ul>
-                {% if  post.body %}
+                {% if post.body %}
                     <hr>
                     <div>
                         {{ post.body_html|bleach }}
@@ -47,8 +47,12 @@
             </div>
         </div>
         <ul class="list-group mb-1">
-            <li class="list-group-item small text-muted"><span>{{ post.replies.count }} 回复</span> |
-                <span>直到 {{ post.latest_reply.submit_date }}</span></li>
+            {% if post.replies.count %}
+                <li class="list-group-item small text-muted"><span>{{ post.replies.count }} 回复</span> |
+                    <span>直到 {{ post.latest_reply.submit_date }}</span></li>
+            {% else %}
+                <li class="list-group-item">目前还没有回复</li>
+            {% endif %}
             {% for reply in post.replies.all %}
                 <li class="list-group-item" id="c{{ reply.pk }}">
                     <div class="media">
@@ -65,9 +69,11 @@
                                 <li class="list-inline-item">
                                     <time>{{ reply.submit_date|timesince }}前</time>
                                 </li>
-                                <li class="list-inline-item">
-                                    <a href="javascript:" class="reply_btn">回复</a>
-                                </li>
+                                {% if request.user.is_authenticated %}
+                                    <li class="list-inline-item">
+                                        <a href="javascript:" class="reply_btn">回复</a>
+                                    </li>
+                                {% endif %}
                                 <li class="pull-right">{{ forloop.counter }} 楼</li>
                             </ul>
                             <div class="">

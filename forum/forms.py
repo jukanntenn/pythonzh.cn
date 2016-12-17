@@ -18,6 +18,8 @@ class PostCreationForm(forms.ModelForm):
         self.helper.form_action = 'forum:create'
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', '发布'))
+
+        # TODO: use Meta attribute
         self.fields['title'].label = '标题'
         self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
         self.fields['body'].label = '正文'

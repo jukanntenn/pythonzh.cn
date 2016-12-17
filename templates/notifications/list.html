@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bootstrap_pagination %}
 {% block main %}
     <main class="col-md-8">
         <ul class="list-group">
@@ -8,9 +9,10 @@
                     <a>通知</a>
                     <a href="{% url 'notifications:mark_all_as_read' %}"
                        class="btn btn-sm btn-outline-info pull-right">全部标为已读</a>
+                    <span class="pull-right text-muted mr-2">总共收到提醒 {{ paginator.count }}</span>
                 </nav>
             </li>
-            {% for notification in notifications %}
+            {% for notification in page_obj %}
                 <li class="list-group-item clearfix {% if notification.unread %}bg-faded{% endif %}">
                     {{ notification.description|safe }}
                     <ul class="list-inline text-muted pull-right" style="margin-top: 5px">
@@ -31,6 +33,9 @@
                     <span class="">暂无通知</span>
                 </li>
             {% endfor %}
+            {% if notifications and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}

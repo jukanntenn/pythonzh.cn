@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load comments %}
-
+{% load bootstrap_pagination %}
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group mb-1">
@@ -40,7 +40,12 @@
                         {% endif %}
                     </div>
                 </li>
+            {% empty %}
+                <li class="list-group-item">该用户下没有帖子</li>
             {% endfor %}
+            {% if paginator.count and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}

@@ -39,3 +39,7 @@ class Post(TimeStampedModel, SoftDeletableModel):
 
     def body_html(self):
         return markdownify(self.body)
+
+    def increase_views(self):
+        self.views += 1
+        self.save(update_fields=['views'])

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load comments %}
-
+{% load bootstrap_pagination %}
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group mb-1">
@@ -13,20 +13,25 @@
                     <a>全部回复</a>
                 </nav>
             </li>
-            {% for reply in reply_list %}
+            {% for reply in page_obj %}
                 <li class="list-group-item clearfix">
                     <div class="" style="margin-bottom: 8px">
                         回复了 <a
                             href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
                         创建的主题 › <a
-                            href="{{ reply.content_object.get_absolute_url }}">{{ reply.content_object.title }}</a>
+                            href="{{ reply.content_object.get_absolute_url }}#c{{ reply.pk }}">{{ reply.content_object.title }}</a>
                     </div>
                     <div class="mark">
                         {{ reply.comment }}
                     </div>
                     <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
                 </li>
+            {% empty %}
+                <li class="list-group-item">该用户下没有回复</li>
             {% endfor %}
+            {% if paginator.count and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}

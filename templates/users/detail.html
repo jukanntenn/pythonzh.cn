@@ -12,6 +12,7 @@
                 </div>
                 <div class="media-body">
                     <h3 class="media-heading">{{ user.nickname }}</h3>
+                    <p>{{ user.signature }}</p>
                     <div>django 中文社区第 {{ user.pk }} 号会员，加入于 {{ user.date_joined }}</div>
                 </div>
             </div>
@@ -47,10 +48,14 @@
                         {% endif %}
                     </div>
                 </li>
+            {% empty %}
+                <li class="list-group-item">该用户下没有帖子</li>
             {% endfor %}
-            <li class="list-group-item small"><a href="{% url 'users:posts' user.username %}"
-                                                 class="text-muted">{{ user.nickname }}
-                发布的更多帖子>></a></li>
+            {% if not post_list.count < 10 %}
+                <li class="list-group-item small"><a href="{% url 'users:posts' user.username %}"
+                                                     class="text-muted">{{ user.nickname }}
+                    发布的更多帖子>></a></li>
+            {% endif %}
         </ul>
         <ul class="list-group">
             <li class="list-group-item">
@@ -62,17 +67,21 @@
                         回复了 <a
                             href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
                         创建的主题 › <a
-                            href="{{ reply.content_object.get_absolute_url }}">{{ reply.content_object.title }}</a>
+                            href="{{ reply.content_object.get_absolute_url }}#c{{ reply.pk }}">{{ reply.content_object.title }}</a>
                     </div>
                     <div class="mark">
                         {{ reply.comment }}
                     </div>
                     <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
                 </li>
+            {% empty %}
+                <li class="list-group-item">该用户下没有回复</li>
             {% endfor %}
-            <li class="list-group-item small"><a href="{% url 'users:replies' user.username %}"
-                                                 class="text-muted">{{ user.nickname }}
-                创建的更多回复>></a></li>
+            {% if not reply_list.count < 10 %}
+                <li class="list-group-item small"><a href="{% url 'users:replies' user.username %}"
+                                                     class="text-muted">{{ user.nickname }}
+                    创建的更多回复>></a></li>
+            {% endif %}
         </ul>
     </main>
 {% endblock main %}

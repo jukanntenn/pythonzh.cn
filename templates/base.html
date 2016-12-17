@@ -36,6 +36,11 @@
                     </li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users:detail' request.user.username %}"><img
+                                    src="{{ request.user.mugshot_thumbnail.url }}" alt=""
+                                    style="width: 26px;"> {{ request.user.nickname }}</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'users:profile' %}">设置</a>
                         </li>
                         <li class="nav-item">

@@ -55,6 +55,10 @@
                                             href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
                                     </li>
                                 {% endif %}
+                                {% if post.views %}
+                                    <li class="list-inline-item">{{ post.views }} 次点击
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
                         {% get_comment_count for post as reply_count %}
@@ -97,7 +101,7 @@
                 </li>
                 <li class="list-group-item">
                     {% notifications_unread as unread_count %}
-                    <a href="{% url 'notifications:all' %}" {% if unread_count %}style="color: red"{% endif %}><i
+                    <a href="{% url 'forum:all' %}" {% if unread_count %}style="color: red"{% endif %}><i
                             class="fa fa-bell"
                             aria-hidden="true"></i> {{ unread_count }} 条未读提醒</a>
                 </li>
