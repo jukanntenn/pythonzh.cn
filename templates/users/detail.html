@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load comments %}
+{% load forum_tags %}
 
 {% block main %}
     <main class="col-md-8 mb-1">
@@ -70,7 +71,7 @@
                             href="{{ reply.content_object.get_absolute_url }}#c{{ reply.pk }}">{{ reply.content_object.title }}</a>
                     </div>
                     <div class="mark">
-                        {{ reply.comment }}
+                        {{ reply.reply_html|bleach }}
                     </div>
                     <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
                 </li>

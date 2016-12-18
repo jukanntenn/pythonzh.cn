@@ -1,15 +1,18 @@
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView
+from django.http import HttpResponseForbidden
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max
 from django.db.models.functions import Coalesce
+from django.core import urlresolvers
+
 from notifications.views import AllNotificationsList
 
 from braces.views import UserFormKwargsMixin
 
 from categories.models import Category
 from .models import Post
-from .forms import PostCreationForm
+from .forms import PostCreationForm, PostEditForm
 
 
 class IndexView(ListView):
@@ -60,6 +63,29 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
         category = get_object_or_404(Category, slug=slug)
         context['category'] = category
         return context
+
+
+class PostEditView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostEditForm
+    template_name = 'forum/post_form.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if self.request.user != self.object.author:
+            return HttpResponseForbidden('只有帖子的作者才能编辑该帖子')
+        return response
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if self.request.user != self.object.author:
+            return HttpResponseForbidden('只有帖子的作者才能编辑该帖子')
+        return response
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.helper.form_action = urlresolvers.reverse('forum:edit', kwargs={'pk': self.kwargs.get('pk')})
+        return form
 
 
 class NotificationsListView(AllNotificationsList):

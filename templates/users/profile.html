@@ -10,16 +10,28 @@
             </h3>
             <hr>
             <ul class="list-unstyled">
-                <li>
+                <li class="mb-1">
                     <strong>用户名：</strong>{{ user.username }}
                 </li>
-                <li>
-                    <strong>邮箱：</strong>zmrenwu@163.com
+                <li class="mb-1">
+                    <strong>邮箱：</strong>
+                    <ul class="list-unstyled">
+                        {% for emailaddress in user.emailaddress_set.all %}
+                            <li>{{ emailaddress.email }}
+                                {% if emailaddress.verified %}
+                                    <span class="verified small">已验证</span>
+                                {% else %}
+                                    <span class="unverified small">未验证</span>
+                                {% endif %}
+                                {% if emailaddress.primary %}
+                                    <span class="primary small" style="color:red">主邮箱</span>{% endif %}</li>
+                        {% endfor %}
+                    </ul>
                 </li>
-                <li>
+                <li class="mb-1">
                     <strong>昵称：</strong>{{ user.nickname }}
                 </li>
-                <li>
+                <li class="mb-1">
                     <strong>个性签名：</strong>{{ user.signature|default:"这个人很懒，什么也没留下" }}
                 </li>
             </ul>
@@ -28,7 +40,7 @@
             <h3 class="card-title">头像上传</h3>
             <hr>
             <span>当前头像</span>
-            <img src="{{ user.mugshot.url }}" alt="Generic placeholder image"
+            <img src="{{ user.mugshot_thumbnail.url }}" alt=""
                  style="width: 96px;">
             <div>
                 <button class="btn btn-outline-info btn-sm mt-1"><a href="{% url 'users:mugshot_change' %}">上传新头像</a>

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap_pagination %}
+{% load notifications_tags %}
 {% block main %}
     <main class="col-md-8">
         <ul class="list-group">
@@ -7,8 +8,11 @@
                 <nav>
                     <a href="{% url 'forum:index' %}">django forum demo</a> >
                     <a>通知</a>
-                    <a href="{% url 'notifications:mark_all_as_read' %}"
-                       class="btn btn-sm btn-outline-info pull-right">全部标为已读</a>
+                    {% notifications_unread as unread_count %}
+                    {% if unread_count %}
+                        <a href="{% url 'notifications:mark_all_as_read' %}"
+                           class="btn btn-sm btn-outline-info pull-right">全部标为已读</a>
+                    {% endif %}
                     <span class="pull-right text-muted mr-2">总共收到提醒 {{ paginator.count }}</span>
                 </nav>
             </li>

@@ -37,6 +37,9 @@
                         <time>{{ post.created|timesince }}前</time>
                     </li>
                     <li class="list-inline-item">{{ post.views }} 次点击</li>
+                    {% if post.author == request.user %}
+                        <li class="list-inline-item"><a href="{% url 'forum:edit' post.pk %}">编辑</a></li>
+                    {% endif %}
                 </ul>
                 {% if post.body %}
                     <hr>

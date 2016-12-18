@@ -12,7 +12,7 @@ class PostCreationForm(forms.ModelForm):
         fields = ('title', 'body', 'category',)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_action = 'forum:create'
@@ -31,5 +31,26 @@ class PostCreationForm(forms.ModelForm):
             self.fields['category'].widget = forms.HiddenInput()
 
     def save(self, commit=True):
-        self.instance.author = self.user
+        if self.user:
+            self.instance.author = self.user
         return super().save(commit=commit)
+
+
+class PostEditForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'body', 'category',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', '发布'))
+
+        # TODO: use Meta attribute
+        self.fields['title'].label = '标题'
+        self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
+        self.fields['body'].label = '正文'
+        self.fields['body'].help_text = '支持 Markdown 语法标记'
+        self.fields['category'].label = '分类'
+        self.fields['category'].help_text = '选择帖子分类'
