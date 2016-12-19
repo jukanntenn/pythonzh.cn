@@ -1,3 +1,5 @@
+{% load forum_tags %}
+
 <div class="media">
     <a class="media-left" href="{{ user.get_absolute_url }}">
         <img class="media-object" src="{{ user.mugshot_thumbnail.url }}"
@@ -11,7 +13,7 @@
             的回复中 @ 了你：
         </div>
         <div class="mark">
-            {{ content }}
+            {{ content|bleach }}
         </div>
     </div>
 </div>

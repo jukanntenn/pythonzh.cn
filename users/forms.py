@@ -1,6 +1,6 @@
 from django import forms
 from django.core import urlresolvers
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import RegexValidator
 
 from allauth.account.forms import (
     LoginForm as AllAuthLoginForm,
@@ -21,7 +21,7 @@ class LoginForm(AllAuthLoginForm):
         self.helper.layout.append(
             HTML("""
             <input type="hidden" name="{{ redirect_field_name }}"
-            value="{% if redirect_field_value %}{{ redirect_field_value }}{% else %}/{% endif %}">'
+            value="{% if redirect_field_value %}{{ redirect_field_value }}{% else %}/{% endif %}">
             """))
         self.helper.add_input(Submit('submit', '登录'))
 
@@ -35,13 +35,13 @@ class SignupForm(AllAuthSignupForm):
         self.helper.add_input(Submit('submit', '注册'))
 
         self.fields['username'].help_text = '用户名只能包含数字和字母'
-        self.fields['password1'].help_text = '不能使用纯数字作为密码'
+        self.fields['password1'].help_text = '不能使用纯数字作为密码，至少8个字符'
 
 
 class UserProfileForm(forms.ModelForm):
-    nickname = forms.CharField(validators=[UnicodeUsernameValidator(regex=r'^[\w_-]+$',
-                                                                    message="除了下划线（_）和连字符（-）外，昵称中不能包含其他特殊符号"
-                                                                    )])
+    nickname = forms.CharField(validators=[RegexValidator(regex=r'^[a-zA-Z0-9\u4e00-\u9fa5]+$',
+                                                          message="除了普通汉字、字母和数字外，昵称中不能包含任何特殊符号"
+                                                          )])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -51,7 +51,7 @@ class UserProfileForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', '确认修改'))
 
         self.fields['nickname'].label = '昵称'
-        self.fields['nickname'].help_text = '除了下划线（_）和连字符（-）外，昵称中不能包含其它特殊符号'
+        self.fields['nickname'].help_text = '除了汉字、字母和数字外，昵称中不能包含任何特殊符号'
         self.fields['signature'].label = '个性签名'
 
     class Meta:

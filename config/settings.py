@@ -155,7 +155,8 @@ ACCOUNT_FORMS = {
     'login': 'users.forms.LoginForm',
     'signup': 'users.forms.SignupForm',
 }
-
+ACCOUNT_USERNAME_MIN_LENGTH = 3
+ACCOUNT_USERNAME_VALIDATORS = 'users.validators.ASCIIUsernameValidator'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MARKDOWN_EXTENSIONS = [

@@ -107,6 +107,10 @@
             var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
             var $replyArea = $('#div_id_comment').find('.textarea').first();
             $replyArea.val($replyArea.val() + $nickname).focus()
+        });
+
+        $('#id_reply_form').submit(function () {
+            $('#submit-id-submit').attr('disabled', true).val('正在提交...');
         })
     </script>
 {% endblock script %}

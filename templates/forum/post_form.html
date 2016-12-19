@@ -19,3 +19,11 @@
         </div>
     </main>
 {% endblock main %}
+
+{% block script %}
+    <script>
+        $('#id_create_form').submit(function () {
+            $('#submit-id-submit').attr('disabled', true).val('发布中...');
+        })
+    </script>
+{% endblock script %}

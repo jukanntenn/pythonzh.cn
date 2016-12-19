@@ -17,6 +17,7 @@ class PostCreationForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.form_action = 'forum:create'
         self.helper.form_method = 'post'
+        self.helper.form_id = 'id_create_form'
         self.helper.add_input(Submit('submit', '发布'))
 
         # TODO: use Meta attribute

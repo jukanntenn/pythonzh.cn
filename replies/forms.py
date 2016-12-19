@@ -12,6 +12,7 @@ class ReplyForm(CommentForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_action = django_comments.get_form_target()
+        self.helper.form_id = 'id_reply_form'
         self.helper.layout = Layout(
             'honeypot',
             'content_type',
