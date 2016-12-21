@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max
 from django.db.models.functions import Coalesce
 from django.core import urlresolvers
+from django.utils import timezone
 
 from notifications.views import AllNotificationsList
 
@@ -52,6 +53,16 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
         category = get_object_or_404(Category, slug=slug)
         initial['category'] = category
         return initial
+
+    def post(self, request, *args, **kwargs):
+        try:
+            latest_post = self.request.user.post_set.all().latest('created')
+            if latest_post.created + timezone.timedelta(minutes=5) > timezone.now():
+                return HttpResponseForbidden('您的发帖时间间隔小于 5 分钟，请稍微休息一会')
+        except Post.DoesNotExist:
+            pass
+
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

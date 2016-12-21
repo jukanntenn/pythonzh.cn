@@ -10,6 +10,7 @@ django-imagekit==3.3
 django-braces==1.10.0
 django-notifications-hq==1.2
 django-bootstrap-pagination==1.6.2
+django-simple-captcha==0.5.3
 
 Markdown==2.6.7
 Pygments==2.1.3

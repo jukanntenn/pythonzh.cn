@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^replies/', include('replies.urls')),
     url(r'^users/', include('users.urls')),
     url(r'^category/', include('categories.urls')),
+    url(r'^captcha/', include('captcha.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

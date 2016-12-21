@@ -8,6 +8,7 @@ from allauth.account.forms import (
 )
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, HTML
+from captcha.fields import CaptchaField
 
 from .models import User
 
@@ -27,6 +28,8 @@ class LoginForm(AllAuthLoginForm):
 
 
 class SignupForm(AllAuthSignupForm):
+    captcha = CaptchaField(label='验证码', help_text="如果看不清验证码，请刷新页面")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'categories',
     'covers',
     'bootstrap_pagination',
+    'captcha',
 ]
 
 COMMENTS_APP = 'replies'
