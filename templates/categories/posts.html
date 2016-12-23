@@ -4,6 +4,7 @@
 {% load notifications_tags %}
 {% load forum_tags %}
 {% load bootstrap_pagination %}
+{% load crispy_forms_tags %}
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group">
@@ -49,20 +50,20 @@
                             <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
                                  alt="" style="width: 48px;">
                         </a>
-                        <div class="media-body">
+                        <div class="media-body post-item">
                             {#                        {% url 'forum:detail' post.slug %}#}
-                            <h5 class="media-heading"><a href="{% url 'forum:detail' post.slug %}">{% if post.pinned %}
+                            <h6 class="media-heading"><a href="{% url 'forum:detail' post.slug %}">{% if post.pinned %}
                                 <span style="color: red">[置顶]</span>{% endif %} {{ post.title }}</a>
-                            </h5>
+                            </h6>
                             <ul class="list-inline text-muted small">
-                                <li class="list-inline-item"><a
+                                <li class="list-inline-item"><a class="nickname"
                                         href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
                                 </li>
                                 {% if post.latest_reply %}
                                     <li class="list-inline-item">
                                         <time>{{ post.latest_reply.submit_date|timesince }}前</time>
                                     </li>
-                                    <li class="list-inline-item">最后回复来自 <a
+                                    <li class="list-inline-item">最后回复来自 <a class="nickname"
                                             href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
                                     </li>
                                 {% endif %}
@@ -84,5 +85,10 @@
                 {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
             {% endif %}
         </ul>
+        <div class="card card-block mt-2">
+            <h6 class="">在 <strong>{{ category }}</strong> 分类下快速发布帖子</h6>
+            <hr>
+            {% crispy form %}
+        </div>
     </main>
 {% endblock main %}

@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 
 from users import views
+from forum.feeds import AllPostsFeed
 
 urlpatterns = [
     url('', include('forum.urls')),
@@ -30,6 +31,7 @@ urlpatterns = [
     url(r'^users/', include('users.urls')),
     url(r'^category/', include('categories.urls')),
     url(r'^captcha/', include('captcha.urls')),
+    url(r'^all/feed/$', AllPostsFeed()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

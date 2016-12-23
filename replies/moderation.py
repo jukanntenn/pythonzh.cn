@@ -20,12 +20,13 @@ class Moderator(DjangoCommentModerator):
 
 class ReplyModerator(CommentModerator):
     def reply(self, reply, content_object, request):
-        # 接受到评论会被 strip，不知道哪一步被处理的，临时为其补一个一个空格，防止@用户名在最后时无法解析
+        # 接受到评论会被 strip，不知道哪一步被处理的，临时为其补一个空格，防止@用户名在最后时无法解析
         reply.comment += ' '
         nicknames = re.findall(r'@(?P<nickname>[a-zA-Z0-9\u4e00-\u9fa5]+) ', reply.comment)
         users = User.objects.filter(nickname__in=nicknames)
         reply.comment = reply.comment.strip()
 
+        mentioned = False
         if users:
             def mark(mo):
                 nickname = mo.group(1)
@@ -35,7 +36,11 @@ class ReplyModerator(CommentModerator):
             pattern = '@(%s)' % ('|'.join(u.nickname for u in users))
             reply.comment = re.sub(pattern, mark, reply.comment)
 
+            # 自己 @ 自己不会收到通知
             recipients = users.exclude(pk=reply.user.pk)
+
+            if content_object.author in recipients:
+                mentioned = True
 
             for recipient in recipients:
                 description = render_to_string('notifications/mention.html', {
@@ -53,7 +58,8 @@ class ReplyModerator(CommentModerator):
                 }
                 notify.send(sender=reply.user, **data)
 
-        if reply.user != content_object.author:
+        # 如果帖子作者没被 @ 并且回复者不是作者自己，则向作者发送一条通知
+        if not mentioned and reply.user != content_object.author:
             description = render_to_string('notifications/reply.html', {
                 'user': reply.user,
                 'post': content_object,

@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from django.db.models.functions import Coalesce
 
 from forum.models import Post
+from forum.forms import PostCreationForm
+
 from .models import Category
 
 
@@ -26,8 +28,11 @@ class CategoryPostView(ListView):
         # TODO: duplicated query
         category = get_object_or_404(Category, slug=self.kwargs.get('slug'))
         category_ancestors = category.get_ancestors()
+        form = PostCreationForm(initial={'category': category})
+
         context.update({
             'category': category,
-            'category_ancestors': category_ancestors
+            'category_ancestors': category_ancestors,
+            'form': form
         })
         return context

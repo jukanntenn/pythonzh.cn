@@ -11,7 +11,7 @@
 {% endblock style %}
 {% block main %}
     <main class="col-md-8">
-        <div class="card">
+        <div class="card post-detail">
             <nav class="card-header">
                 <a href="{% url 'forum:index' %}">django forum demo</a> >
                 {% with ancestors=post.category.get_ancestors %}
@@ -43,7 +43,7 @@
                 </ul>
                 {% if post.body %}
                     <hr>
-                    <div>
+                    <div class="post-body">
                         {{ post.body_html|bleach }}
                     </div>
                 {% endif %}

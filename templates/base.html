@@ -41,6 +41,16 @@
             display: block;
             -webkit-overflow-scrolling: touch;
         }
+
+        /* 简单地设置会使 meidia 失效 */
+        .post-body img {
+            max-width: 100%;
+        }
+
+        .post-item h6 > a,
+        .post-item .nickname {
+            color: #666;
+        }
     </style>
     {% block style %}
     {% endblock style %}

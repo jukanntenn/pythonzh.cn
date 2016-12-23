@@ -16,6 +16,12 @@
                         <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
                                                         class="btn btn-sm btn-outline-success">{{ category }}</a></li>
                     {% endfor %}
+                    <li class="list-inline-item pull-right">
+                        <a href="/all/feed/">
+                            <i class="fa fa-rss" aria-hidden="true"></i> 通过 RSS Feed
+                            订阅
+                        </a>
+                    </li>
                 </ul>
                 {% get_quick_categories as quick_categoriy_list %}
                 {% if quick_categoriy_list %}
@@ -31,44 +37,7 @@
             </li>
             {% for post in page_obj %}
                 <li class="list-group-item">
-                    <div class="media">
-                        <a class="media-left" href="{{ post.author.get_absolute_url }}">
-                            <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
-                                 alt="" style="width: 48px;">
-                        </a>
-                        <div class="media-body">
-                            <h5 class="media-heading"><a href="{% url 'forum:detail' post.slug %}">{% if post.pinned %}
-                                <span style="color: red">[置顶]</span>{% endif %} {{ post.title }}</a>
-                            </h5>
-                            <ul class="list-inline text-muted small">
-                                <li class="list-inline-item"><a href="{% url 'categories:posts' post.category.slug %}"
-                                                                class="tag tag-default">{{ post.category }}</a>
-                                </li>
-                                <li class="list-inline-item"><a
-                                        href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
-                                </li>
-                                {% if post.latest_reply %}
-                                    <li class="list-inline-item">
-                                        <time>{{ post.latest_reply.submit_date|timesince }}前</time>
-                                    </li>
-                                    <li class="list-inline-item">最后回复来自 <a
-                                            href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
-                                    </li>
-                                {% endif %}
-                                {% if post.views %}
-                                    <li class="list-inline-item">{{ post.views }} 次点击
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                        {% get_comment_count for post as reply_count %}
-                        {% if reply_count %}
-                            <div class="media-right media-middle">
-                                <a href="{{ post.get_absolute_url }}"
-                                   class="tag tag-default tag-pill">{{ reply_count }}</a>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include 'forum/_post_item.html' %}
                 </li>
             {% empty %}
                 <li class="list-group-item">暂无帖子</li>

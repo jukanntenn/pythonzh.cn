@@ -18,7 +18,7 @@ from .forms import PostCreationForm, PostEditForm
 
 class IndexView(ListView):
     paginate_orphans = 5
-    paginate_by = 10
+    paginate_by = 20
     model = Post
     template_name = 'forum/index.html'
 
@@ -48,6 +48,7 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     def get_initial(self):
         initial = super().get_initial()
         slug = self.kwargs.get('slug')
+
         if not slug:
             return initial
         category = get_object_or_404(Category, slug=slug)
