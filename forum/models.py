@@ -31,7 +31,7 @@ class Post(TimeStampedModel, SoftDeletableModel):
         return self.title
 
     def get_absolute_url(self):
-        return urlresolvers.reverse('forum:detail', args=(self.slug,))
+        return urlresolvers.reverse('forum:detail', args=(self.pk,))
 
     @property
     def latest_reply(self):

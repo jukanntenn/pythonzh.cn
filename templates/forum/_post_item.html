@@ -6,14 +6,16 @@
              alt="" style="width: 3em;">
     </a>
     <div class="media-body post-item">
-        <h6 class="media-heading font-weight-bold"><a href="{% url 'forum:detail' post.slug %}">
+        <h6 class="media-heading font-weight-bold"><a href="{{ post.get_absolute_url }}">
             {% if post.pinned %}
                 <span style="color: red">[置顶]</span>{% endif %} {{ post.title }}</a>
         </h6>
         <ul class="list-inline text-muted small">
-            <li class="list-inline-item"><a href="{% url 'categories:posts' post.category.slug %}"
-                                            class="tag tag-default">{{ post.category }}</a>
-            </li>
+            {% block category %}
+                <li class="list-inline-item"><a href="{% url 'categories:posts' post.category.slug %}"
+                                                class="tag tag-default">{{ post.category }}</a>
+                </li>
+            {% endblock category %}
             <li class="list-inline-item"><a
                     href="{{ post.author.get_absolute_url }}"
                     class="nickname"><strong>{{ post.author.nickname }}</strong></a>
