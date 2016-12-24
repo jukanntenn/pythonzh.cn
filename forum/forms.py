@@ -2,6 +2,7 @@ from django import forms
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+from simplemde.widgets import SimpleMDEEditor
 
 from .models import Post
 
@@ -27,6 +28,7 @@ class PostCreationForm(forms.ModelForm):
         self.fields['body'].help_text = '支持 Markdown 语法标记'
         self.fields['category'].label = '分类'
         self.fields['category'].help_text = '选择帖子分类'
+        self.fields['body'].widget = SimpleMDEEditor()
 
         if self.initial.get('category'):
             self.fields['category'].widget = forms.HiddenInput()
@@ -55,3 +57,4 @@ class PostEditForm(forms.ModelForm):
         self.fields['body'].help_text = '支持 Markdown 语法标记'
         self.fields['category'].label = '分类'
         self.fields['category'].help_text = '选择帖子分类'
+        self.fields['body'].widget = SimpleMDEEditor()
