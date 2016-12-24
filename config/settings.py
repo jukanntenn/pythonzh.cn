@@ -193,3 +193,5 @@ NOTIFICATION_TEMPLATES = {
     '@': 'notifications/mention.html',
     'reply': 'notifications/reply.html',
 }
+
+USE_PAGEDOWN = False

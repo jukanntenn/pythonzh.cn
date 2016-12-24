@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 
 from django_comments.forms import CommentForm
 from crispy_forms.helper import FormHelper
@@ -7,6 +8,8 @@ from simplemde.widgets import SimpleMDEEditor
 from pagedown.widgets import PagedownWidget
 
 import django_comments
+
+use_pagedown = getattr(settings, 'USE_PAGEDOWN')
 
 
 class ReplyForm(CommentForm):
@@ -29,4 +32,6 @@ class ReplyForm(CommentForm):
         self.helper.add_input(Submit('submit', '回复', css_class='btn-sm'))
 
         self.fields['comment'].label = ''
-        self.fields['comment'].widget = PagedownWidget()
+
+        if use_pagedown:
+            self.fields['comment'].widget = PagedownWidget()

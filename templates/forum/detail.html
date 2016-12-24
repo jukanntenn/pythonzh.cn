@@ -103,32 +103,27 @@
 {% block script %}
     <script>
         $(document).ready(function () {
-            var simplemde = $('.simplemde-box')[0].SimpleMDE;
-
-            function replyOne(object) {
-                var $nickname = '@' + object.parent().siblings().first().find('.nickname').first().text() + ' ';
-                var oldContent = simplemde.value();
-                simplemde.value(oldContent + $nickname);
-                $(window).scrollTop($('#id_reply_form').offset().top);
-            }
-
-            $(".reply_btn").on("click", function () {
-                replyOne($(this));
+            /*
+            $('.reply_btn').on('click', function () {
+                var $this = $(this);
+                var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
+                var $replyArea = $('#div_id_comment').find('.wmd-panel').first().find('textarea').first();
+                $replyArea.val($replyArea.val() + $nickname).focus()
             });
+            */
+
+            $('.reply_btn').on('click', function () {
+                var $this = $(this);
+                var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
+                var $replyArea = $('#div_id_comment').find('textarea').first();
+                $replyArea.val($replyArea.val() + $nickname).focus()
+            });
+
+
+            $('#id_reply_form').submit(function () {
+                $('#submit-id-submit').attr('disabled', true).val('正在提交...');
+            })
         });
 
-
-        {#        $('.reply_btn').on('click', function () {#}
-        {#            var $this = $(this);#}
-        {#            var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';#}
-        {#            var $replyArea = $('#div_id_comment').find('.CodeMirror').first().find('textarea').first();#}
-        {#            console.log($replyArea);#}
-        {#            //.find('textarea').first();#}
-        {#            $replyArea.val($replyArea.val() + $nickname).focus()#}
-        {#        });#}
-
-        $('#id_reply_form').submit(function () {
-            $('#submit-id-submit').attr('disabled', true).val('正在提交...');
-        })
     </script>
 {% endblock script %}
