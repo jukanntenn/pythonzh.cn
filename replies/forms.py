@@ -4,6 +4,7 @@ from django_comments.forms import CommentForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Hidden
 from simplemde.widgets import SimpleMDEEditor
+from pagedown.widgets import PagedownWidget
 
 import django_comments
 
@@ -15,7 +16,7 @@ class ReplyForm(CommentForm):
         self.helper.form_action = django_comments.get_form_target()
         self.helper.form_id = 'id_reply_form'
         self.helper.attrs = {'novalidate': ''}
-        self.helper.include_media = False
+        # self.helper.include_media = False
         self.helper.layout = Layout(
             'honeypot',
             'content_type',
@@ -28,4 +29,4 @@ class ReplyForm(CommentForm):
         self.helper.add_input(Submit('submit', '回复', css_class='btn-sm'))
 
         self.fields['comment'].label = ''
-        self.fields['comment'].widget = SimpleMDEEditor()
+        self.fields['comment'].widget = PagedownWidget()

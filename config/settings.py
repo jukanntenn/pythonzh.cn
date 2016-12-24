@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'bootstrap_pagination',
     'captcha',
     'simplemde',
+    'pagedown',
 ]
 
 COMMENTS_APP = 'replies'

@@ -3,6 +3,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from simplemde.widgets import SimpleMDEEditor
+from pagedown.widgets import PagedownWidget
 
 from .models import Post
 
@@ -20,7 +21,7 @@ class PostCreationForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.form_id = 'id_create_form'
         self.helper.add_input(Submit('submit', '发布'))
-        self.helper.include_media = False
+        # self.helper.include_media = False
         # TODO: use Meta attribute
         self.fields['title'].label = '标题'
         self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
@@ -28,7 +29,7 @@ class PostCreationForm(forms.ModelForm):
         self.fields['body'].help_text = '支持 Markdown 语法标记'
         self.fields['category'].label = '分类'
         self.fields['category'].help_text = '选择帖子分类'
-        self.fields['body'].widget = SimpleMDEEditor()
+        self.fields['body'].widget = PagedownWidget()
 
         if self.initial.get('category'):
             self.fields['category'].widget = forms.HiddenInput()
@@ -49,7 +50,7 @@ class PostEditForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', '发布'))
-        self.helper.include_media = False
+        # self.helper.include_media = False
         # TODO: use Meta attribute
         self.fields['title'].label = '标题'
         self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
@@ -57,4 +58,4 @@ class PostEditForm(forms.ModelForm):
         self.fields['body'].help_text = '支持 Markdown 语法标记'
         self.fields['category'].label = '分类'
         self.fields['category'].help_text = '选择帖子分类'
-        self.fields['body'].widget = SimpleMDEEditor()
+        self.fields['body'].widget = PagedownWidget()
