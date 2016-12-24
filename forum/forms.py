@@ -20,7 +20,7 @@ class PostCreationForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.form_id = 'id_create_form'
         self.helper.add_input(Submit('submit', '发布'))
-
+        self.helper.include_media = False
         # TODO: use Meta attribute
         self.fields['title'].label = '标题'
         self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
@@ -49,7 +49,7 @@ class PostEditForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', '发布'))
-
+        self.helper.include_media = False
         # TODO: use Meta attribute
         self.fields['title'].label = '标题'
         self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
