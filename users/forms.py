@@ -1,6 +1,7 @@
 from django import forms
 from django.core import urlresolvers
 from django.core.validators import RegexValidator
+from django.utils.html import mark_safe
 
 from allauth.account.forms import (
     LoginForm as AllAuthLoginForm,
@@ -28,7 +29,8 @@ class LoginForm(AllAuthLoginForm):
 
 
 class SignupForm(AllAuthSignupForm):
-    captcha = CaptchaField(label='验证码', help_text="如果看不清验证码，请刷新页面")
+    captcha = CaptchaField(label='验证码',
+                           help_text=mark_safe('<i class="fa fa-refresh" aria-hidden="true" id="refresh-btn"></i>'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
