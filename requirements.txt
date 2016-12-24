@@ -11,6 +11,7 @@ django-braces==1.10.0
 django-notifications-hq==1.2
 django-bootstrap-pagination==1.6.2
 django-simple-captcha==0.5.3
+django-simplemde==0.1.0
 
 Markdown==2.6.7
 Pygments==2.1.3
