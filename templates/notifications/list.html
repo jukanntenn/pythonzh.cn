@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load bootstrap_pagination %}
 {% load notifications_tags %}
+{% load forum_tags %}
 {% block main %}
     <main class="col-md-8">
         <ul class="list-group">
@@ -18,7 +19,7 @@
             </li>
             {% for notification in page_obj %}
                 <li class="list-group-item clearfix {% if notification.unread %}bg-faded{% endif %}">
-                    {{ notification.description|safe }}
+                    {{ notification | describe }}
                     <ul class="list-inline text-muted pull-right" style="margin-top: 5px">
                         <li class="list-inline-item">
                             <time class="small">{{ notification.timestamp|timesince }}前</time>
@@ -26,7 +27,7 @@
                         {% if notification.unread %}
                             <li class="list-inline-item"><a
                                     href="{% url 'notifications:mark_as_read' notification.slug %}"
-                                    class="tag tag-info">标为已读</a></li>
+                                    class="tag tag-info mark-btn">标为已读</a></li>
                         {% endif %}
                         <li class="list-inline-item">
                             <a href="{% url 'notifications:delete' notification.slug %}"
@@ -44,3 +45,17 @@
         </ul>
     </main>
 {% endblock main %}
+
+{% block script %}
+    <script>
+        $('.notification-jump').on('click', function (e) {
+            var $this = $(this);
+            var $state = $this.attr('data-state');
+
+            if (parseInt($state)) {
+                var $target = $this.attr('data-target');
+                $.get($target);
+            }
+        })
+    </script>
+{% endblock script %}

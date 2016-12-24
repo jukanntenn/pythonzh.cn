@@ -1,3 +1,4 @@
+import re
 import datetime
 
 from django import template
@@ -7,11 +8,15 @@ from django.utils.html import mark_safe
 from django.db.models import Max
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now, timedelta
+from django.template.loader import render_to_string
 
 import bleach
 
+from users.models import User
 from categories.models import Category
 from ..models import Post
+from ..mark import markdownify
+from ..utils import parse_nicknames
 
 register = template.Library()
 
@@ -60,3 +65,26 @@ def bleach_value(value):
 
 
 register.filter('bleach', bleach_value)
+
+
+@register.filter
+def describe(obj):
+    verb = obj.verb
+    tmpl = getattr(settings, 'NOTIFICATION_TEMPLATES')[verb]
+    context = {
+        'notification': obj,
+        'actor': obj.actor,
+        'action_obj': obj.action_object,
+        'target': obj.target,
+    }
+    return render_to_string(tmpl, context=context)
+
+
+@register.filter
+def mark(value):
+    return markdownify(value)
+
+
+@register.filter(name='parse_nicknames')
+def parse_nicknames_filter(value):
+    return parse_nicknames(value)

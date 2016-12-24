@@ -186,3 +186,8 @@ BLEACH_ALLOWED_ATTRIBUTES = {
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/users/login/'
+
+NOTIFICATION_TEMPLATES = {
+    '@': 'notifications/mention.html',
+    'reply': 'notifications/reply.html',
+}
