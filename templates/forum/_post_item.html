@@ -1,10 +1,12 @@
 {% load comments %}
 
 <div class="media">
-    <a class="media-left" href="{{ post.author.get_absolute_url }}">
-        <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
-             alt="" style="width: 3em;">
-    </a>
+    {% block post_author_mugshot %}
+        <a class="media-left" href="{{ post.author.get_absolute_url }}">
+            <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
+                 alt="" style="width: 3em;">
+        </a>
+    {% endblock post_author_mugshot %}
     <div class="media-body post-item">
         <h6 class="media-heading font-weight-bold"><a href="{{ post.get_absolute_url }}">
             {% if post.pinned %}

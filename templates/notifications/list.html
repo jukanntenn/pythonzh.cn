@@ -6,15 +6,23 @@
     <main class="col-md-8">
         <ul class="list-group">
             <li class="list-group-item">
-                <nav>
-                    <a href="{% url 'forum:index' %}">django forum demo</a> >
-                    <a>通知</a>
-                    {% notifications_unread as unread_count %}
-                    {% if unread_count %}
-                        <a href="{% url 'notifications:mark_all_as_read' %}"
-                           class="btn btn-sm btn-outline-info pull-right">全部标为已读</a>
-                    {% endif %}
-                    <span class="pull-right text-muted mr-2">总共收到提醒 {{ paginator.count }}</span>
+
+
+                <nav class="row">
+                    <div class="col-md-6">
+                        <a href="{% url 'forum:index' %}">django forum demo</a> >
+                        <a>通知</a>
+                    </div>
+                    <div class="col-md-3">
+                        {% notifications_unread as unread_count %}
+                        {% if unread_count %}
+                            <a href="{% url 'notifications:mark_all_as_read' %}"
+                               class="btn btn-sm btn-outline-info">全部标为已读</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3">
+                        <span class="text-muted mr-2 small">总共收到提醒 {{ paginator.count }}</span>
+                    </div>
                 </nav>
             </li>
             {% for notification in page_obj %}

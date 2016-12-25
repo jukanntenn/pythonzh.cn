@@ -1,50 +1,7 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-{% load comments %}
-{% load notifications_tags %}
-{% load forum_tags %}
-{% load bootstrap_pagination %}
+
 {% block main %}
     <main class="col-md-8 mb-1">
-        <ul class="list-group">
-            <li class="list-group-item">
-                <ul class="list-inline">
-                    <li class="list-inline-item"><a href="{% url 'forum:index' %}" class="btn btn-sm btn-success">全部</a>
-                    </li>
-                    {% get_categories as category_list %}
-                    {% for category in category_list %}
-                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
-                                                        class="btn btn-sm btn-outline-success">{{ category }}</a></li>
-                    {% endfor %}
-                    <li class="list-inline-item pull-right">
-                        <a href="/all/feed/">
-                            <i class="fa fa-rss" aria-hidden="true"></i> 通过 RSS Feed
-                            订阅
-                        </a>
-                    </li>
-                </ul>
-                {% get_quick_categories as quick_categoriy_list %}
-                {% if quick_categoriy_list %}
-                    <ul class="list-inline text-muted" style="margin-top: 16px">
-                        快速浏览：
-
-                        {% for category in quick_categoriy_list %}
-                            <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
-                                                            class="tag tag-default">{{ category }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </li>
-            {% for post in page_obj %}
-                <li class="list-group-item">
-                    {% include 'forum/_post_item.html' %}
-                </li>
-            {% empty %}
-                <li class="list-group-item">暂无帖子</li>
-            {% endfor %}
-            {% if post_list and paginator.num_pages > 1 %}
-                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
-            {% endif %}
-        </ul>
+        {% include 'forum/_index.html' %}
     </main>
 {% endblock main %}

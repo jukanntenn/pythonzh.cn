@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% load comments %}
-{% load forum_tags %}
 {% load bootstrap_pagination %}
 {% block main %}
     <main class="col-md-8 mb-1">
@@ -15,18 +14,7 @@
                 </nav>
             </li>
             {% for reply in page_obj %}
-                <li class="list-group-item clearfix">
-                    <div class="" style="margin-bottom: 8px">
-                        回复了 <a
-                            href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
-                        创建的主题 › <a
-                            href="{{ reply.content_object.get_absolute_url }}#c{{ reply.pk }}">{{ reply.content_object.title }}</a>
-                    </div>
-                    <div class="mark">
-                        {{ reply.reply_html|bleach }}
-                    </div>
-                    <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
-                </li>
+                {% include 'users/_user_reply_item.html' %}
             {% empty %}
                 <li class="list-group-item">该用户下没有回复</li>
             {% endfor %}

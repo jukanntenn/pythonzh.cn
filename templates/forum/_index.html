@@ -1,0 +1,38 @@
+{% extends 'forum/_post_list.html' %}
+
+{% load forum_tags %}
+
+{% block post_list_head %}
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-md-8">
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="{% url 'forum:index' %}" class="btn btn-sm btn-success">全部</a>
+                    </li>
+                    {% get_categories as category_list %}
+                    {% for category in category_list %}
+                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                                                        class="btn btn-sm btn-outline-success">{{ category }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% get_quick_categories as quick_categoriy_list %}
+                {% if quick_categoriy_list %}
+                    <ul class="list-inline text-muted" style="margin-top: 16px">
+                        快速浏览：
+
+                        {% for category in quick_categoriy_list %}
+                            <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                                                            class="tag tag-default">{{ category }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-md-right">
+                <a href="/all/feed/" class="text-muted small">
+                    <i class="fa fa-rss" aria-hidden="true"></i> 通过 RSS Feed
+                    订阅
+                </a>
+            </div>
+        </div>
+    </li>
+{% endblock post_list_head %}

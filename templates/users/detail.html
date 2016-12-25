@@ -24,30 +24,7 @@
             </li>
             {% for post in post_list %}
                 <li class="list-group-item">
-                    <div class="media">
-                        <div class="media-body">
-                            <h5 class="media-heading"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h5>
-                            <ul class="list-inline text-muted small">
-                                <li class="list-inline-item"><a href="" class="tag tag-default">{{ post.category }}</a>
-                                </li>
-                                <li class="list-inline-item"><a
-                                        href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <time>{{ post.created|timesince }}前</time>
-                                </li>
-                                <li class="list-inline-item">最后回复来自 <a
-                                        href="{{ post.latest_reply.user.get_absolute_url }}"><strong>{{ post.latest_reply.user.nickname }}</strong></a>
-                                </li>
-                            </ul>
-                        </div>
-                        {% get_comment_count for post as reply_count %}
-                        {% if reply_count %}
-                            <div class="media-right media-middle">
-                                <a href="" class="tag tag-default tag-pill">{{ reply_count }}</a>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include 'users/_user_post_item.html' %}
                 </li>
             {% empty %}
                 <li class="list-group-item">该用户下没有帖子</li>
@@ -63,18 +40,7 @@
                 {{ user.nickname }} 最近回复了
             </li>
             {% for reply in reply_list %}
-                <li class="list-group-item clearfix">
-                    <div class="" style="margin-bottom: 8px">
-                        回复了 <a
-                            href="{{ reply.content_object.author.get_absolute_url }}">{{ reply.content_object.author.nickname }}</a>
-                        创建的主题 › <a
-                            href="{{ reply.content_object.get_absolute_url }}#c{{ reply.pk }}">{{ reply.content_object.title }}</a>
-                    </div>
-                    <div class="mark">
-                        {{ reply.reply_html|bleach }}
-                    </div>
-                    <time class="pull-right small text-muted">{{ reply.submit_date|timesince }}前</time>
-                </li>
+                {% include 'users/_user_reply_item.html' %}
             {% empty %}
                 <li class="list-group-item">该用户下没有回复</li>
             {% endfor %}

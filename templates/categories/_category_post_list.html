@@ -1,0 +1,52 @@
+{% extends 'forum/_post_list.html' %}
+
+{% load forum_tags %}
+
+{% block post_list_head %}
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="media">
+                    <a class="media-left">
+                        <img class="media-object" src="{{ category.cover.cover_thumbnail.url }}"
+                             alt="" style="width: 72px;border-radius: 10px">
+                    </a>
+                    <div class="media-body">
+                        <nav class="media-heading">
+                            <a href="{% url 'forum:index' %}">django forum demo</a> >
+                            {% for category in category_ancestors %}
+                                <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a> >
+                            {% endfor %}
+                            <a>{{ category }}</a>
+                        </nav>
+                        <div class="text-muted small">
+                            {{ category.description }}
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" style="margin-top: 8px"><a
+                                href="{% url 'forum:create' category.slug %}">发布新帖子</a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 text-md-right">
+                <span class="text-muted small">帖子总数 {{ post_list.count }}</span>
+            </div>
+        </div>
+
+    </li>
+    {% if category.children.count %}
+        <li class="list-group-item  bg-faded">
+            <ul class="list-inline">
+                <li class="list-inline-item"><span class="">子分类：</span></li>
+                {% for c in category.children.all %}
+                    <li class="list-inline-item"><a href="{% url 'categories:posts' c.slug %}"
+                                                    class="tag tag-default">{{ c }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endif %}
+{% endblock post_list_head %}
+
+{% block post_item %}
+    {% include 'categories/_category_post_item.html' %}
+{% endblock post_item %}
