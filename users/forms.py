@@ -30,7 +30,7 @@ class LoginForm(AllAuthLoginForm):
 
 class SignupForm(AllAuthSignupForm):
     captcha = CaptchaField(label='验证码',
-                           help_text=mark_safe('<i class="fa fa-refresh" aria-hidden="true" id="refresh-btn"></i>'))
+                           help_text='如果看不清验证码，请点击图片刷新')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -23,7 +23,7 @@
 
 {% block script %}
     <script>
-        $('#refresh-btn').on('click', function () {
+        $('#div_id_captcha').find('img').first().on('click', function () {
             var $form = $(this).parents('form');
 
             $.getJSON('/captcha/refresh/', {}, function (json) {
