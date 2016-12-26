@@ -12,7 +12,8 @@
     <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/simplemde/1.11.2/simplemde.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'forum/css/friendly.css' %}">
-    <title>django forum demo</title>
+    {% notifications_unread as unread_count %}
+    <title>{% if unread_count %}({{ unread_count }}){% endif %} django forum demo</title>
     <style>
         body {
             background-color: #f8f9fa;
@@ -70,6 +71,12 @@
 
         .post-body a {
             text-decoration: underline;
+        }
+
+        .media {
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: auto;
         }
 
         /* pagedown */
