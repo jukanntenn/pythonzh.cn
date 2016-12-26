@@ -2,14 +2,14 @@ from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.db.models.functions import Coalesce
 from django.db.models import Max
+from django.utils.feedgenerator import Atom1Feed
 
 from .models import Post
 from .mark import markdownify
 from .templatetags.forum_tags import bleach_value
 
 
-# TODO: 支持 RSS 和 Atom
-class AllPostsFeed(Feed):
+class AllPostsRssFeed(Feed):
     title = "django 测试论坛"
     link = "/"
     description = "首页的全部帖子"
@@ -25,3 +25,8 @@ class AllPostsFeed(Feed):
 
     def item_description(self, item):
         return bleach_value(markdownify(item.body))
+
+
+class AllPostsAtomFeed(AllPostsRssFeed):
+    feed_type = Atom1Feed
+    subtitle = AllPostsRssFeed.description
