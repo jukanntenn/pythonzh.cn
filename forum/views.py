@@ -6,6 +6,7 @@ from django.db.models import Max
 from django.db.models.functions import Coalesce
 from django.core import urlresolvers
 from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
 
 from notifications.views import AllNotificationsList
 
@@ -39,6 +40,12 @@ class PostDetailView(DetailView):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
         self.object.increase_views()
         return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post_ctype_id = ContentType.objects.get_for_model(self.object).pk
+        context['post_ctype_id'] = post_ctype_id
+        return context
 
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):

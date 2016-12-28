@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'captcha',
     'simplemde',
     'pagedown',
+    'actstream',
+    'follows',
 ]
 
 COMMENTS_APP = 'replies'

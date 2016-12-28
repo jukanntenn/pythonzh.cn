@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% load comments %}
 {% load forum_tags %}
+{% load  follow_tags %}
 {% block style %}
     <style>
         #div_id_honeypot {
@@ -47,6 +48,12 @@
                         {{ post.body_html|bleach }}
                     </div>
                 {% endif %}
+            </div>
+            <div class="card-footer">
+                {% is_following request.user post 'favorite' as follow_flag %}
+                <a href="javascript:" id="{% if follow_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
+                   role="button" data-contenttype-id="{{ post_ctype_id }}"
+                   data-object-id="{{ post.pk }}">{% if follow_flag %}取消收藏{% else %}加入收藏{% endif %}</a>
             </div>
         </div>
         <ul class="list-group mb-1">
@@ -104,13 +111,13 @@
     <script>
         $(document).ready(function () {
             /*
-            $('.reply_btn').on('click', function () {
-                var $this = $(this);
-                var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
-                var $replyArea = $('#div_id_comment').find('.wmd-panel').first().find('textarea').first();
-                $replyArea.val($replyArea.val() + $nickname).focus()
-            });
-            */
+             $('.reply_btn').on('click', function () {
+             var $this = $(this);
+             var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
+             var $replyArea = $('#div_id_comment').find('.wmd-panel').first().find('textarea').first();
+             $replyArea.val($replyArea.val() + $nickname).focus()
+             });
+             */
 
             $('.reply_btn').on('click', function () {
                 var $this = $(this);
@@ -122,8 +129,52 @@
 
             $('#id_reply_form').submit(function () {
                 $('#submit-id-submit').attr('disabled', true).val('正在提交...');
-            })
-        });
+            });
 
+            function favorite() {
+                var $this = $(this);
+                var $ctypeId = $this.attr('data-contenttype-id');
+                var $objectId = $this.attr('data-object-id');
+                var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/favorite/';
+                $.post(
+                    $url,
+                    {
+                        content_type_id: $ctypeId,
+                        object_id: $objectId,
+                        ftype: 'favorite'
+                    },
+                    function (data, status) {
+                        $this.attr('id', 'unfavorite-btn');
+                        $this.text('取消收藏');
+                        $this.off('click');
+                        $this.on('click', unfavorite)
+                    }
+                )
+            }
+
+            function unfavorite() {
+                var $this = $(this);
+                var $ctypeId = $this.attr('data-contenttype-id');
+                var $objectId = $this.attr('data-object-id');
+                var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/favorite/';
+                $.post(
+                    $url,
+                    {
+                        content_type_id: $ctypeId,
+                        object_id: $objectId,
+                        ftype: 'favorite'
+                    },
+                    function (data, status) {
+                        $this.attr('id', 'favorite-btn');
+                        $this.text('加入收藏');
+                        $this.off('click');
+                        $this.on('click', favorite)
+                    }
+                )
+            }
+
+            $('#favorite-btn').on('click', favorite);
+            $('#unfavorite-btn').on('click', unfavorite);
+        });
     </script>
 {% endblock script %}

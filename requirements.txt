@@ -13,6 +13,7 @@ django-bootstrap-pagination==1.6.2
 django-simple-captcha==0.5.3
 django-simplemde==0.1.0
 django-pagedown==0.1.1
+django-activity-stream==0.6.3
 
 Markdown==2.6.7
 Pygments==2.1.3

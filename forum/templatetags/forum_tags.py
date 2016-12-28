@@ -12,7 +12,6 @@ from django.template.loader import render_to_string
 
 import bleach
 
-from users.models import User
 from categories.models import Category
 from ..models import Post
 from ..mark import markdownify
