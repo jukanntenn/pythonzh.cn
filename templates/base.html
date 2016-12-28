@@ -10,7 +10,6 @@
     {#    <link rel="stylesheet" href="{% static 'forum/css/bootstrap.min.css' %}">#}
     <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="//cdn.bootcss.com/simplemde/1.11.2/simplemde.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'forum/css/friendly.css' %}">
     {% notifications_unread as unread_count %}
     <title>{% if unread_count %}({{ unread_count }}){% endif %} django forum demo</title>
@@ -182,6 +181,11 @@
                                             class="fa fa-bell"
                                             aria-hidden="true"></i> {{ unread_count }} 条未读提醒</a>
                                 </li>
+                                <li class="list-group-item">
+                                    <a href="{% url 'users:favorite' %}"><i class="fa fa-bookmark"
+                                                                            aria-hidden="true"></i>
+                                        收藏列表</a>
+                                </li>
                             </ul>
                         {% else %}
                             <div class="card card-block">
@@ -229,30 +233,6 @@
 <script src="//cdn.bootcss.com/tether/1.4.0/js/tether.min.js"></script>
 {#<script src="{% static 'forum/js/bootstrap.min.js' %}"></script>#}
 <script src="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js"></script>
-<script src="//cdn.bootcss.com/simplemde/1.11.2/simplemde.min.js"></script>
-<script>
-    var simplemdeJQuery = null;
-
-    if (typeof jQuery !== 'undefined') {
-        simplemdeJQuery = jQuery;
-    } else if (typeof django !== 'undefined') {
-        //use jQuery come with django admin
-        simplemdeJQuery = django.jQuery
-    } else {
-        console.error('cant find jQuery, please make sure your have jQuery imported before this script');
-    }
-
-    if (!!simplemdeJQuery) {
-        simplemdeJQuery(function () {
-            simplemdeJQuery.each(simplemdeJQuery('.simplemde-box'), function (i, elem) {
-                var options = JSON.parse(simplemdeJQuery(elem).attr('data-simplemde-options'));
-                options['element'] = elem;
-                var simplemde = new SimpleMDE(options);
-                elem.SimpleMDE = simplemde;
-            });
-        });
-    }
-</script>
 {% block script %}
 {% endblock script %}
 </body>

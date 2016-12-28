@@ -78,3 +78,12 @@ class UserReplyListView(ListView):
         user = User.objects.get(username=self.kwargs.get('username'))
         context['user'] = user
         return context
+
+
+class UserFavoriteView(LoginRequiredMixin, ListView):
+    paginate_by = 10
+    context_object_name = 'favorite_list'
+    template_name = 'users/favorite_posts.html'
+
+    def get_queryset(self):
+        return self.request.user.follows.filter(ftype='favorite').order_by('-started')
