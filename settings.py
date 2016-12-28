@@ -24,7 +24,7 @@ SECRET_KEY = 'si^7v_12e*!alrw55=9g#s^)q9sixng03dy=f^7c&mzoxew92j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['yangxg.top', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 SITE_ID = 1
 # Application definition
 
