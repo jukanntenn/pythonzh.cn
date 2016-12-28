@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_extensions',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -195,3 +196,7 @@ NOTIFICATION_TEMPLATES = {
 }
 
 USE_PAGEDOWN = False
+
+SHELL_PLUS_PRE_IMPORTS = (
+    ('datetime', '*'),
+)

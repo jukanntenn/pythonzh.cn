@@ -2,6 +2,7 @@ django==1.10.4
 django-model-utils==2.6
 django-allauth==0.29.0
 django-crispy-forms==1.6.1
+django-extensions==1.7.5
 django-taggit==0.21.3
 django-contrib-comments==1.7.3
 django-mptt==0.8.6
