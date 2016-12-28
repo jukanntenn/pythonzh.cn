@@ -90,6 +90,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-database/
+db.sqlite3
 media/
 .idea/
