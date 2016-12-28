@@ -16,6 +16,7 @@ django-simplemde==0.1.0
 django-pagedown==0.1.1
 
 Markdown==2.6.7
+Path.py==9.0.1
 Pygments==2.1.3
 Pillow==3.4.2
 python-slugify==1.2.1
