@@ -1,0 +1,48 @@
+[
+{
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$30000$6Qec2puvHbB9$52UQj9fHYdmFnP6c2PjkrS3KV+Iom6oP1S0Vhdnd8GE=",
+        "last_login": "2016-12-28T09:04:00.089Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@example.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2016-12-28T08:50:52.780Z",
+        "last_login_ip": null,
+        "ip_joined": null,
+        "nickname": "admin",
+        "signature": "",
+        "mugshot": "mugshots/admin/default_mugshot.png",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$30000$Ms8Lv1pgs6kS$wfPv+0noVZtavxmTgbHXzkGm6uCWb9zU3ng+9ALLdXQ=",
+        "last_login": "2016-12-28T09:14:34.066Z",
+        "is_superuser": false,
+        "username": "test",
+        "first_name": "",
+        "last_name": "",
+        "email": "test@example.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2016-12-28T09:05:21.187Z",
+        "last_login_ip": "127.0.0.1",
+        "ip_joined": null,
+        "nickname": "test",
+        "signature": "",
+        "mugshot": "mugshots/test/default_mugshot.png",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]
