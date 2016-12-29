@@ -194,6 +194,9 @@ LOGIN_URL = '/users/login/'
 NOTIFICATION_TEMPLATES = {
     '@': 'notifications/mention.html',
     'reply': 'notifications/reply.html',
+    'favorite': 'notifications/favorite.html',
+    'watch': 'notifications/watch.html',
+    'praise': 'notifications/praise.html',
 }
 
 USE_PAGEDOWN = False

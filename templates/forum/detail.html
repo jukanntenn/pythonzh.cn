@@ -50,15 +50,27 @@
                 {% endif %}
             </div>
             <div class="card-footer">
-                {% is_following request.user post 'favorite' as favorite_flag %}
-                <a href="javascript:" class="{% if favorite_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
-                   role="button" data-contenttype-id="{{ post_ctype_id }}"
-                   data-object-id="{{ post.pk }}">{% if favorite_flag %}取消收藏{% else %}加入收藏{% endif %}</a>
-
-                {% is_following request.user post 'watch' as watch_flag %}
-                <a href="javascript:" class="{% if watch_flag %}unwatch-btn{% else %}watch-btn{% endif %}"
-                   role="button" data-contenttype-id="{{ post_ctype_id }}"
-                   data-object-id="{{ post.pk }}">{% if watch_flag %}取消关注{% else %}关注{% endif %}</a>
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        {% is_following request.user post 'favorite' as favorite_flag %}
+                        <a href="javascript:"
+                           class="{% if favorite_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
+                           role="button" data-contenttype-id="{{ post_ctype_id }}"
+                           data-object-id="{{ post.pk }}">{% if favorite_flag %}
+                            <i class="fa fa-star" aria-hidden="true"></i> 已收藏{% else %}
+                            <i class="fa fa-star-o" aria-hidden="true"></i> 收藏{% endif %}
+                            （{{ post|follower_count:'favorite' }}）</a>
+                    </li>
+                    <li class="list-inline-item">
+                        {% is_following request.user post 'watch' as watch_flag %}
+                        <a href="javascript:" class="{% if watch_flag %}unwatch-btn{% else %}watch-btn{% endif %}"
+                           role="button" data-contenttype-id="{{ post_ctype_id }}"
+                           data-object-id="{{ post.pk }}">{% if watch_flag %}
+                            <i class="fa fa-heart" aria-hidden="true"></i> 已关注{% else %}
+                            <i class="fa fa-star-o" aria-hidden="true"></i> 关注{% endif %}
+                            （{{ post|follower_count:'watch' }}）</a>
+                    </li>
+                </ul>
             </div>
         </div>
         <ul class="list-group mb-1">
@@ -95,8 +107,11 @@
                                     <a href="javascript:"
                                        class="{% if favorite_flag %}unthumbup-btn{% else %}thumbup-btn{% endif %}"
                                        role="button" data-contenttype-id="{{ reply|ctype_id }}"
-                                       data-object-id="{{ reply.pk }}">{% if favorite_flag %}取消赞{% else %}
-                                        赞{% endif %}</a></li>
+                                       data-object-id="{{ reply.pk }}">{% if favorite_flag %}
+                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>{% else %}
+                                        <i class="fa fa-thumbs-o-up"
+                                           aria-hidden="true"></i>{% endif %} {{ reply|follower_count:'praise' }}</a>
+                                </li>
                             </ul>
                             <div class="">
                                 {{ reply.reply_html|bleach }}

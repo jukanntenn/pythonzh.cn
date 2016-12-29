@@ -1,0 +1,22 @@
+{% load forum_tags %}
+
+<div class="media">
+    <a class="media-left" href="{{ actor.get_absolute_url }}">
+        <img class="media-object" src="{{ actor.mugshot_thumbnail.url }}"
+             alt="" style="width: 24px;">
+    </a>
+    <div class="media-body">
+        <div class="media-heading">
+            用户 <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
+            赞了你的在帖子
+            <a href="{{ target.content_object.get_absolute_url }}#c{{ target.pk }}"
+               data-state="{% if notification.unread %}1{% else %}0{% endif %}"
+               data-target="{% url 'notifications:mark_as_read' notification.slug %}" class="notification-jump">
+                {{ target.content_object.title }}</a>
+            中的回复
+            <div class="mark">
+                {{ target.comment|parse_nicknames|mark|bleach }}
+            </div>
+        </div>
+    </div>
+</div>
