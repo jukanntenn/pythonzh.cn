@@ -13,15 +13,15 @@
                         <a href="{% url 'forum:index' %}">django forum demo</a> >
                         <a>通知</a>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 text-md-right">
                         {% notifications_unread as unread_count %}
                         {% if unread_count %}
                             <a href="{% url 'notifications:mark_all_as_read' %}"
                                class="btn btn-sm btn-outline-info">全部标为已读</a>
                         {% endif %}
                     </div>
-                    <div class="col-md-3">
-                        <span class="text-muted mr-2 small">总共收到提醒 {{ paginator.count }}</span>
+                    <div class="col-md-3 text-md-right">
+                        <span class="text-muted small">总共收到提醒 {{ paginator.count }}</span>
                     </div>
                 </nav>
             </li>

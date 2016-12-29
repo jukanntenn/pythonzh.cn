@@ -9,6 +9,7 @@ from django.db.models import Max
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now, timedelta
 from django.template.loader import render_to_string
+from django.contrib.contenttypes.models import ContentType
 
 import bleach
 
@@ -87,3 +88,8 @@ def mark(value):
 @register.filter(name='parse_nicknames')
 def parse_nicknames_filter(value):
     return parse_nicknames(value)
+
+
+@register.filter
+def ctype_id(obj):
+    return ContentType.objects.get_for_model(obj).pk

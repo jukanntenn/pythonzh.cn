@@ -50,10 +50,15 @@
                 {% endif %}
             </div>
             <div class="card-footer">
-                {% is_following request.user post 'favorite' as follow_flag %}
-                <a href="javascript:" id="{% if follow_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
+                {% is_following request.user post 'favorite' as favorite_flag %}
+                <a href="javascript:" class="{% if favorite_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
                    role="button" data-contenttype-id="{{ post_ctype_id }}"
-                   data-object-id="{{ post.pk }}">{% if follow_flag %}取消收藏{% else %}加入收藏{% endif %}</a>
+                   data-object-id="{{ post.pk }}">{% if favorite_flag %}取消收藏{% else %}加入收藏{% endif %}</a>
+
+                {% is_following request.user post 'watch' as watch_flag %}
+                <a href="javascript:" class="{% if watch_flag %}unwatch-btn{% else %}watch-btn{% endif %}"
+                   role="button" data-contenttype-id="{{ post_ctype_id }}"
+                   data-object-id="{{ post.pk }}">{% if watch_flag %}取消关注{% else %}关注{% endif %}</a>
             </div>
         </div>
         <ul class="list-group mb-1">
@@ -85,6 +90,13 @@
                                     </li>
                                 {% endif %}
                                 <li class="pull-right">{{ forloop.counter }} 楼</li>
+                                <li class="pull-right mr-1">
+                                    {% is_following request.user reply 'praise' as favorite_flag %}
+                                    <a href="javascript:"
+                                       class="{% if favorite_flag %}unthumbup-btn{% else %}thumbup-btn{% endif %}"
+                                       role="button" data-contenttype-id="{{ reply|ctype_id }}"
+                                       data-object-id="{{ reply.pk }}">{% if favorite_flag %}取消赞{% else %}
+                                        赞{% endif %}</a></li>
                             </ul>
                             <div class="">
                                 {{ reply.reply_html|bleach }}
@@ -131,50 +143,66 @@
                 $('#submit-id-submit').attr('disabled', true).val('正在提交...');
             });
 
-            function favorite() {
+            function follow(event) {
                 var $this = $(this);
+                var $thisID = $this.attr('class');
                 var $ctypeId = $this.attr('data-contenttype-id');
                 var $objectId = $this.attr('data-object-id');
-                var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/favorite/';
+                var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/' + event.data.ftype + '/';
                 $.post(
                     $url,
                     {
                         content_type_id: $ctypeId,
                         object_id: $objectId,
-                        ftype: 'favorite'
+                        ftype: event.data.ftype
                     },
                     function (data, status) {
-                        $this.attr('id', 'unfavorite-btn');
-                        $this.text('取消收藏');
+                        $this.attr('class', 'un' + $thisID);
+                        $this.text(event.data.ftext);
                         $this.off('click');
-                        $this.on('click', unfavorite)
+                        $this.on('click', {
+                            ftype: event.data.ftype,
+                            ftext: event.data.unftext,
+                            unftext: event.data.ftext
+                        }, unfollow)
                     }
                 )
             }
 
-            function unfavorite() {
+            function unfollow(event) {
                 var $this = $(this);
+                var $thisID = $this.attr('class');
                 var $ctypeId = $this.attr('data-contenttype-id');
                 var $objectId = $this.attr('data-object-id');
-                var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/favorite/';
+                var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/' + event.data.ftype + '/';
                 $.post(
                     $url,
                     {
                         content_type_id: $ctypeId,
                         object_id: $objectId,
-                        ftype: 'favorite'
+                        ftype: event.data.ftype
                     },
                     function (data, status) {
-                        $this.attr('id', 'favorite-btn');
-                        $this.text('加入收藏');
+                        $this.attr('class', $thisID.substring(2, $thisID.length));
+                        $this.text(event.data.ftext);
                         $this.off('click');
-                        $this.on('click', favorite)
+                        $this.on('click', {
+                            ftype: event.data.ftype,
+                            ftext: event.data.unftext,
+                            unftext: event.data.ftext
+                        }, follow)
                     }
                 )
             }
 
-            $('#favorite-btn').on('click', favorite);
-            $('#unfavorite-btn').on('click', unfavorite);
+            $('.favorite-btn').on('click', {ftype: 'favorite', ftext: '取消收藏', unftext: '加入收藏'}, follow);
+            $('.unfavorite-btn').on('click', {ftype: 'favorite', ftext: '加入收藏', unftext: '取消收藏'}, unfollow);
+
+            $('.watch-btn').on('click', {ftype: 'watch', ftext: '取消关注', unftext: '关注'}, follow);
+            $('.unwatch-btn').on('click', {ftype: 'watch', ftext: '关注', unftext: '取消关注'}, unfollow);
+
+            $('.thumbup-btn').on('click', {ftype: 'praise', ftext: '取消赞', unftext: '赞'}, follow);
+            $('.unthumbup-btn').on('click', {ftype: 'praise', ftext: '赞', unftext: '取消赞'}, unfollow);
         });
     </script>
 {% endblock script %}
