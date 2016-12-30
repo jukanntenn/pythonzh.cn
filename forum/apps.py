@@ -8,7 +8,9 @@ class ForumConfig(AppConfig):
         from replies.moderation import moderator
         from replies.moderation import ReplyModerator
         from replies.models import Reply
+        from users.models import User
         from actstream import registry
         moderator.register(self.get_model('Post'), ReplyModerator)
         registry.register(self.get_model('Post'))
         registry.register(Reply)
+        registry.register(User)

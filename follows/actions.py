@@ -6,6 +6,11 @@ from notifications.signals import notify
 
 from .models import Follow
 
+RECIPIENT = {
+    'Post': 'author',
+    'Reply': 'user',
+}
+
 
 def follow(user, obj, ftype, send_action=True, actor_only=True, **kwargs):
     check(obj)
@@ -17,12 +22,12 @@ def follow(user, obj, ftype, send_action=True, actor_only=True, **kwargs):
     if send_action and created:
         action.send(user, verb=ftype, target=obj, **kwargs)
 
-    try:
-        recipient = obj.author
-    except:
-        recipient = obj.user
+    if obj.__class__.__name__ not in RECIPIENT:
+        recipient = obj
+    else:
+        recipient = getattr(obj, RECIPIENT[obj.__class__.__name__], None)
 
-    if user != recipient:
+    if recipient and user != recipient:
         notify.send(sender=user, recipient=recipient, verb=ftype, target=obj)
     return instance
 

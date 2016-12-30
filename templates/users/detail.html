@@ -2,6 +2,7 @@
 
 {% load comments %}
 {% load forum_tags %}
+{% load follow_tags %}
 
 {% block main %}
     <main class="col-md-8 mb-1">
@@ -15,6 +16,23 @@
                     <h3 class="media-heading">{{ user.nickname }}</h3>
                     <p>{{ user.signature }}</p>
                     <div>django forum demo 第 {{ user.pk }} 号会员，加入于 {{ user.date_joined }}</div>
+                    {% is_following request.user user 'follow' as follow_flag %}
+
+                    <button class="btn btn-sm btn-outline-info mt-1
+                            {% if follow_flag %} unfollow-btn{% else %} follow-btn{% endif %}"
+                            data-contenttype-id="{{ user|ctype_id }}"
+                            data-object-id="{{ user.pk }}">
+                        <a href="">
+                            {% if follow_flag %}
+                                <i class="fa fa-check" aria-hidden="true"></i> 已关注
+                            {% else %}
+                                <i class="fa fa-plus" aria-hidden="true"></i> 关注
+                            {% endif %}
+                        </a>
+                    </button>
+                    <a class="btn btn-sm btn-link mt-1" role="button"><span
+                            class="follow-number">{{ user|follower_count:'follow' }}</span>
+                        人关注</a>
                 </div>
             </div>
         </div>
@@ -52,3 +70,56 @@
         </ul>
     </main>
 {% endblock main %}
+
+{% block script %}
+    <script>
+        function follow(e) {
+            var $this = $(this);
+            var $ctypeId = $this.attr('data-contenttype-id');
+            var $objectId = $this.attr('data-object-id');
+            var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/follow/';
+            $.post(
+                $url,
+                {
+                    content_type_id: $ctypeId,
+                    object_id: $objectId,
+                    ftype: 'follow'
+                },
+                function (data, status) {
+                    $this.find('a').first().html('<i class="fa fa-check" aria-hidden="true"></i> 已关注');
+                    var $followNumber = $this.next().first().find('.follow-number').first();
+                    $followNumber.text(parseInt($followNumber.text()) + 1);
+                    $this.off('click');
+                    $this.on('click', unfollow)
+                }
+            );
+            e.preventDefault();
+        }
+
+        function unfollow(e) {
+            var $this = $(this);
+            var $ctypeId = $this.attr('data-contenttype-id');
+            var $objectId = $this.attr('data-object-id');
+            var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/follow/';
+            $.post(
+                $url,
+                {
+                    content_type_id: $ctypeId,
+                    object_id: $objectId,
+                    ftype: 'follow'
+                },
+                function (data, status) {
+                    $this.find('a').first().html('<i class="fa fa-plus" aria-hidden="true"></i> 关注');
+                    var $followNumber = $this.next().first().find('.follow-number').first();
+                    $followNumber.text(parseInt($followNumber.text()) - 1);
+                    $this.off('click');
+                    $this.on('click', follow)
+                }
+            );
+            e.preventDefault();
+        }
+
+        $('.follow-btn').on('click', follow);
+        $('.unfollow-btn').on('click', unfollow);
+    </script>
+{% endblock script %}

@@ -197,6 +197,7 @@ NOTIFICATION_TEMPLATES = {
     'favorite': 'notifications/favorite.html',
     'watch': 'notifications/watch.html',
     'praise': 'notifications/praise.html',
+    'follow': 'notifications/follow.html',
 }
 
 USE_PAGEDOWN = False
