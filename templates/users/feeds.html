@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% load bootstrap_pagination %}
+{% load forum_tags %}
+
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <ul class="list-group">
+            {% block post_list_head %}
+                <li class="list-group-item">
+                    <span class="pull-right">关注的动态总数 {{ like_list.count }}</span>
+                    <nav>
+                        <a href="{% url 'forum:index' %}">django forum demo</a> >
+                        <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >
+                        <a>关注的动态</a>
+                    </nav>
+                </li>
+            {% endblock post_list_head %}
+
+            {% for feed in feed_list %}
+                <li class="list-group-item">
+                    {{ feed|feed }}
+                </li>
+            {% empty %}
+                <li class="list-group-item">没有关注的动态</li>
+            {% endfor %}
+            {% if feed_list and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
+        </ul>
+    </main>
+{% endblock main %}

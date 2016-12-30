@@ -1,5 +1,7 @@
 from django.template import Library
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
+from django.template.loader import render_to_string
 
 from .. import actions
 from ..models import Follow
@@ -18,3 +20,14 @@ def is_following(user, obj, ftype):
 def follower_count(obj, ftype):
     ctype = ContentType.objects.get_for_model(obj)
     return Follow.objects.filter(content_type=ctype, object_id=obj.pk, ftype=ftype).count()
+
+
+@register.filter
+def action(obj):
+    ftype = obj.ftype
+    tmpl = getattr(settings, 'ACTION_TEMPLATES')[ftype]
+    context = {
+        'like': obj,
+        'follow_object': obj.follow_object,
+    }
+    return render_to_string(tmpl, context=context)

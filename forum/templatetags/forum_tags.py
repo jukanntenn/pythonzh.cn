@@ -81,6 +81,32 @@ def describe(obj):
 
 
 @register.filter
+def stream(obj):
+    verb = obj.verb
+    tmpl = getattr(settings, 'STREAM_TEMPLATES')[verb]
+    context = {
+        'actor': obj.actor,
+        'target': obj.target,
+        'action_object': obj.action_object,
+        'timestamp': obj.timestamp
+    }
+    return render_to_string(tmpl, context=context)
+
+
+@register.filter
+def feed(obj):
+    verb = obj.verb
+    tmpl = getattr(settings, 'FEED_TEMPLATES')[verb]
+    context = {
+        'actor': obj.actor,
+        'target': obj.target,
+        'action_object': obj.action_object,
+        'timestamp': obj.timestamp
+    }
+    return render_to_string(tmpl, context=context)
+
+
+@register.filter
 def mark(value):
     return markdownify(value)
 

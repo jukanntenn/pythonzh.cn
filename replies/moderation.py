@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.utils.html import mark_safe
 
 from notifications.signals import notify
+from actstream.signals import action
 
 from users.models import User
 from forum.mark import markdownify
@@ -77,6 +78,7 @@ class ReplyModerator(CommentModerator):
             notify.send(sender=reply.user, **data)
 
         reply.save()
+        action.send(reply.user, verb='reply', action_object=reply, target=content_object)
 
 
 moderator = Moderator()

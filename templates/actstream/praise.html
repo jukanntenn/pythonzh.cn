@@ -1,0 +1,11 @@
+{% load forum_tags %}
+
+<time class="text-muted small">{{ timestamp|timesince }}前</time>
+<div>
+    赞了用户 <a href="{{ target.user.get_absolute_url }}">{{ target.user.nickname }}</a>
+    在帖子 <a href="{{ target.content_object.get_absolute_url }}">{{ target.content_object.title }}</a>
+    中的回复
+    <div class="mark">
+        {{ target.comment|parse_nicknames|mark|bleach }}
+    </div>
+</div>

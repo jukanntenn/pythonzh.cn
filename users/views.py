@@ -2,7 +2,11 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, UpdateView, DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
+from actstream.models import actor_stream, Action
+
+from follows.models import Follow
 from forum.models import Post
 from replies.models import Reply
 from .forms import UserProfileForm, MugshotForm
@@ -46,7 +50,14 @@ class UserDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         posts = self.object.post_set.all().order_by('-created')[:10]
         replies = self.object.reply_comments.all().order_by('-submit_date')[:10]
-        context.update({'post_list': posts, 'reply_list': replies})
+
+        user_streams = actor_stream(self.object).exclude(verb__regex=r'^un[a-z]+$')[:20]
+
+        context.update({
+            'post_list': posts,
+            'reply_list': replies,
+            'user_streams': user_streams,
+        })
         return context
 
 
@@ -87,3 +98,30 @@ class UserFavoriteView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return self.request.user.follows.filter(ftype='favorite').order_by('-started')
+
+
+class UserLikeView(ListView):
+    model = Follow
+    paginate_by = 20
+    context_object_name = 'like_list'
+    template_name = 'users/likes.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(Q(ftype='watch') | Q(ftype='praise'),
+                                             user__username=self.kwargs.get('username')
+                                             ).order_by('-started')
+
+
+class UserFeedView(LoginRequiredMixin, ListView):
+    model = Action
+    paginate_by = 10
+    context_object_name = 'feed_list'
+    template_name = 'users/feeds.html'
+
+    def get_queryset(self):
+        user_watch = [follow.follow_object.pk for follow in self.request.user.follows.filter(ftype='watch')]
+        user_follow = [follow.follow_object.pk for follow in self.request.user.follows.filter(ftype='follow')]
+
+        return super().get_queryset().filter(
+            Q(actor_object_id__in=user_follow) | Q(target_object_id__in=user_watch, verb='reply')).order_by(
+            '-timestamp')

@@ -1,0 +1,5 @@
+<time class="text-muted small">{{ like.started|timesince }}前</time>
+<div>
+    喜欢了用户 <a href="{{ follow_object.author.get_absolute_url }}">{{ follow_object.author.nickname }}</a>
+    发布的帖子 <a href="{{ follow_object.get_absolute_url }}">{{ follow_object.title }}</a>
+</div>

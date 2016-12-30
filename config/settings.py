@@ -200,4 +200,25 @@ NOTIFICATION_TEMPLATES = {
     'follow': 'notifications/follow.html',
 }
 
+STREAM_TEMPLATES = {
+    'follow': 'actstream/follow.html',
+    'watch': 'actstream/watch.html',
+    'praise': 'actstream/praise.html',
+    'favorite': 'actstream/favorite.html',
+    'reply': 'actstream/reply.html',
+}
+
+ACTION_TEMPLATES = {
+    'watch': 'follows/watch.html',
+    'praise': 'follows/praise.html',
+}
+
+FEED_TEMPLATES = {
+    'watch': 'feeds/watch.html',
+    'follow': 'feeds/follow.html',
+    'praise': 'feeds/praise.html',
+    'favorite': 'feeds/favorite.html',
+    'reply': 'feeds/reply.html',
+}
+
 USE_PAGEDOWN = False

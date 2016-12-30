@@ -182,10 +182,21 @@
                                             aria-hidden="true"></i> {{ unread_count }} 条未读提醒</a>
                                 </li>
                                 <li class="list-group-item">
-                                    <a href="{% url 'users:favorite' %}"><i class="fa fa-bookmark"
+                                    <a href="{% url 'users:favorite' %}"><i class="fa fa-star"
                                                                             aria-hidden="true"></i>
                                         收藏列表</a>
                                 </li>
+                                <li class="list-group-item">
+                                    <a href="{% url 'users:likes' request.user.username %}"><i class="fa fa-heart"
+                                                                                               aria-hidden="true"></i>
+                                        我的喜欢</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="{% url 'users:feed' %}"><i class="fa fa-feed"
+                                                                        aria-hidden="true"></i>
+                                        我关注的动态</a>
+                                </li>
+
                             </ul>
                         {% else %}
                             <div class="card card-block">
