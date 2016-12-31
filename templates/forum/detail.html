@@ -51,9 +51,10 @@
             </div>
             <div class="card-footer">
                 <ul class="list-inline mb-0">
+                    {% comment %}
                     <li class="list-inline-item">
                         {% is_following request.user post 'favorite' as favorite_flag %}
-                        <a href="javascript:"
+                            <a href="javascript:"
                            class="{% if favorite_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
                            role="button" data-contenttype-id="{{ post_ctype_id }}"
                            data-object-id="{{ post.pk }}">{% if favorite_flag %}
@@ -61,14 +62,30 @@
                             <i class="fa fa-star-o" aria-hidden="true"></i> 收藏{% endif %}
                             （{{ post|follower_count:'favorite' }}）</a>
                     </li>
-                    <li class="list-inline-item">
+                    {% endcomment %}
+                    <li class="list-inline-item small">
+                        {% is_following request.user post 'favorite' as favorite_flag %}
+                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_id object_id=post.pk ftype='favorite' %}"
+                           role="button" id="favorite-btn"
+                           {% if favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star-o"
+                                                                                     aria-hidden="true"></i> 收藏</a>
+                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_id object_id=post.pk ftype='favorite' %}"
+                           role="button" id="unfavorite-btn"
+                           {% if not favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star"
+                                                                                         aria-hidden="true"></i> 已收藏</a>
+                        （<span id="favorite-number">{{ post|follower_count:'favorite' }}</span>）
+                    </li>
+                    <li class="list-inline-item small">
                         {% is_following request.user post 'watch' as watch_flag %}
-                        <a href="javascript:" class="{% if watch_flag %}unwatch-btn{% else %}watch-btn{% endif %}"
-                           role="button" data-contenttype-id="{{ post_ctype_id }}"
-                           data-object-id="{{ post.pk }}">{% if watch_flag %}
-                            <i class="fa fa-heart" aria-hidden="true"></i> 已关注{% else %}
-                            <i class="fa fa-star-o" aria-hidden="true"></i> 关注{% endif %}
-                            （{{ post|follower_count:'watch' }}）</a>
+                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_id object_id=post.pk ftype='watch' %}"
+                           role="button" id="watch-btn"
+                           {% if watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart-o"
+                                                                                  aria-hidden="true"></i> 喜欢</a>
+                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_id object_id=post.pk ftype='watch' %}"
+                           role="button" id="unwatch-btn"
+                           {% if not watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart"
+                                                                                      aria-hidden="true"></i> 已喜欢</a>
+                        （<span id="watch-number">{{ post|follower_count:'watch' }}</span>）
                     </li>
                 </ul>
             </div>
@@ -96,26 +113,36 @@
                                 <li class="list-inline-item">
                                     <time>{{ reply.submit_date|timesince }}前</time>
                                 </li>
-                                {% if request.user.is_authenticated %}
-                                    <li class="list-inline-item">
-                                        <a href="javascript:" class="reply_btn">回复</a>
-                                    </li>
-                                {% endif %}
                                 <li class="pull-right">{{ forloop.counter }} 楼</li>
-                                <li class="pull-right mr-1">
-                                    {% is_following request.user reply 'praise' as favorite_flag %}
-                                    <a href="javascript:"
-                                       class="{% if favorite_flag %}unthumbup-btn{% else %}thumbup-btn{% endif %}"
-                                       role="button" data-contenttype-id="{{ reply|ctype_id }}"
-                                       data-object-id="{{ reply.pk }}">{% if favorite_flag %}
-                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>{% else %}
-                                        <i class="fa fa-thumbs-o-up"
-                                           aria-hidden="true"></i>{% endif %} {{ reply|follower_count:'praise' }}</a>
-                                </li>
                             </ul>
                             <div class="">
                                 {{ reply.reply_html|bleach }}
                             </div>
+                            <ul class="list-inline text-muted small">
+                                <li class="list-inline-item">
+                                    {% is_following request.user reply 'praise' as praise_flag %}
+                                    <a href="{% url 'follows:follow_all' content_type_id=reply|ctype_id object_id=reply.pk ftype='praise' %}"
+                                       class="thumbup-btn"
+                                       role="button"
+                                       {% if praise_flag %}style="display: none"{% endif %}>
+                                        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="{% url 'follows:unfollow_all' content_type_id=reply|ctype_id object_id=reply.pk ftype='praise' %}"
+                                       class="unthumbup-btn"
+                                       role="button"
+                                       {% if not praise_flag %}style="display: none"{% endif %}>
+                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                    </a>
+                                    <span class="praise-number">{{ reply|follower_count:'praise' }}</span>
+                                </li>
+                                ·
+                                {% if request.user.is_authenticated %}
+                                    <li class="list-inline-item">
+                                        <a href="javascript:" class="reply_btn"
+                                           data-nickname="{{ reply.user.nickname }}">回复</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </div>
                 </li>
@@ -137,18 +164,9 @@
 {% block script %}
     <script>
         $(document).ready(function () {
-            /*
-             $('.reply_btn').on('click', function () {
-             var $this = $(this);
-             var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
-             var $replyArea = $('#div_id_comment').find('.wmd-panel').first().find('textarea').first();
-             $replyArea.val($replyArea.val() + $nickname).focus()
-             });
-             */
-
             $('.reply_btn').on('click', function () {
                 var $this = $(this);
-                var $nickname = '@' + $this.parent().siblings().first().find('.nickname').first().text() + ' ';
+                var $nickname = '@' + $this.attr('data-nickname') + ' ';
                 var $replyArea = $('#div_id_comment').find('textarea').first();
                 $replyArea.val($replyArea.val() + $nickname).focus()
             });
@@ -158,66 +176,75 @@
                 $('#submit-id-submit').attr('disabled', true).val('正在提交...');
             });
 
-            function follow(event) {
-                var $this = $(this);
-                var $thisID = $this.attr('class');
-                var $ctypeId = $this.attr('data-contenttype-id');
-                var $objectId = $this.attr('data-object-id');
-                var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/' + event.data.ftype + '/';
-                $.post(
-                    $url,
-                    {
-                        content_type_id: $ctypeId,
-                        object_id: $objectId,
-                        ftype: event.data.ftype
-                    },
-                    function (data, status) {
-                        $this.attr('class', 'un' + $thisID);
-                        $this.text(event.data.ftext);
-                        $this.off('click');
-                        $this.on('click', {
-                            ftype: event.data.ftype,
-                            ftext: event.data.unftext,
-                            unftext: event.data.ftext
-                        }, unfollow)
-                    }
-                )
-            }
 
-            function unfollow(event) {
-                var $this = $(this);
-                var $thisID = $this.attr('class');
-                var $ctypeId = $this.attr('data-contenttype-id');
-                var $objectId = $this.attr('data-object-id');
-                var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/' + event.data.ftype + '/';
-                $.post(
-                    $url,
-                    {
-                        content_type_id: $ctypeId,
-                        object_id: $objectId,
-                        ftype: event.data.ftype
-                    },
-                    function (data, status) {
-                        $this.attr('class', $thisID.substring(2, $thisID.length));
-                        $this.text(event.data.ftext);
-                        $this.off('click');
-                        $this.on('click', {
-                            ftype: event.data.ftype,
-                            ftext: event.data.unftext,
-                            unftext: event.data.ftext
-                        }, follow)
-                    }
-                )
-            }
+            $("#favorite-btn, #unfavorite-btn").click(function () {
+                $.post($(this).attr("href"), {});
+                var $favoriteNumber = $(this).parent().find("#favorite-number").first().text();
+                if ($(this).attr("id") == "favorite-btn") {
+                    $(this).parent().find("#favorite-number").first().text(parseInt($favoriteNumber) + 1)
+                } else {
+                    $(this).parent().find("#favorite-number").first().text(parseInt($favoriteNumber) - 1)
+                }
+                $(this).parent().find("#favorite-btn, #unfavorite-btn").toggle();
+                return false
+            });
 
-            $('.favorite-btn').on('click', {ftype: 'favorite', ftext: '取消收藏', unftext: '加入收藏'}, follow);
-            $('.unfavorite-btn').on('click', {ftype: 'favorite', ftext: '加入收藏', unftext: '取消收藏'}, unfollow);
+            $("#watch-btn, #unwatch-btn").click(function () {
+                $.post($(this).attr("href"), {});
 
-            $('.watch-btn').on('click', {ftype: 'watch', ftext: '取消关注', unftext: '关注'}, follow);
-            $('.unwatch-btn').on('click', {ftype: 'watch', ftext: '关注', unftext: '取消关注'}, unfollow);
+                var $watchNumber = $(this).parent().find("#watch-number").first().text();
+                if ($(this).attr("id") == "watch-btn") {
+                    $(this).parent().find("#watch-number").first().text(parseInt($watchNumber) + 1)
+                } else {
+                    $(this).parent().find("#watch-number").first().text(parseInt($watchNumber) - 1)
+                }
 
-            $('.thumbup-btn').on('click', {ftype: 'praise', ftext: '取消赞', unftext: '赞'}, follow);
-            $('.unthumbup-btn').on('click', {ftype: 'praise', ftext: '赞', unftext: '取消赞'}, unfollow);
+                $(this).parent().find("#watch-btn, #unwatch-btn").toggle();
+                return false
+            });
+
+            $(".thumbup-btn, .unthumbup-btn").click(function () {
+                $.post($(this).attr("href"), {});
+                var $praiseNumber = $(this).parent().find(".praise-number").first().text();
+                if ($(this).attr("class") == "thumbup-btn") {
+                    $(this).parent().find(".praise-number").first().text(parseInt($praiseNumber) + 1)
+                } else {
+                    $(this).parent().find(".praise-number").first().text(parseInt($praiseNumber) - 1)
+                }
+                $(this).parent().find(".thumbup-btn, .unthumbup-btn").toggle();
+                return false
+            });
+
+            /*
+             function thumbup() {
+             var $this = $(this);
+             $.post(
+             $(this).attr("href"),
+             {},
+             function (data, status) {
+             $this.off('click');
+             $this.on('click', unthumbup)
+             }
+             );
+             return false
+             }
+
+             function unthumbup() {
+             var $this = $(this);
+             $.post(
+             $(this).attr("href"),
+             {},
+             function (data, status) {
+             $this.off('click');
+             $this.on('click', thumbup)
+             }
+             );
+             return false
+             }
+
+             $('.thumbup-btn').on('click', thumbup);
+             $('.unthumbup-btn').on('click', unthumbup);
+             */
         });
     </script>
 {% endblock script %}

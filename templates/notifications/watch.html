@@ -8,7 +8,7 @@
     <div class="media-body">
         <div class="media-heading">
             用户 <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
-            关注了你发布的帖子
+            喜欢了你发布的帖子
             <a href="{{ target.get_absolute_url }}"
                data-state="{% if notification.unread %}1{% else %}0{% endif %}"
                data-target="{% url 'notifications:mark_as_read' notification.slug %}" class="notification-jump">

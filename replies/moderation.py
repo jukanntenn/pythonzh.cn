@@ -21,6 +21,7 @@ class Moderator(DjangoCommentModerator):
 
 class ReplyModerator(CommentModerator):
     def reply(self, reply, content_object, request):
+
         # 接受到评论会被 strip，不知道哪一步被处理的，临时为其补一个空格，防止@用户名在最后时无法解析
         reply.comment += ' '
         nicknames = re.findall(r'@(?P<nickname>[a-zA-Z0-9\u4e00-\u9fa5]+) ', reply.comment)
@@ -44,41 +45,25 @@ class ReplyModerator(CommentModerator):
                 mentioned = True
 
             for recipient in recipients:
-                # description = render_to_string('notifications/mention.html', {
-                #     'user': reply.user,
-                #     'post': content_object,
-                #     'reply': reply,
-                #     'content': markdownify(reply.comment)
-                # })
                 data = {
                     'recipient': recipient,
                     'verb': '@',
-                    'action_object': reply,
-                    'target': recipient,
-                    # 'description': description
+                    'target': reply,
                 }
                 notify.send(sender=reply.user, **data)
 
         # 如果帖子作者没被 @ 并且回复者不是作者自己，则向作者发送一条通知
         if not mentioned and reply.user != content_object.author:
-            # description = render_to_string('notifications/reply.html', {
-            #     'user': reply.user,
-            #     'post': content_object,
-            #     'reply': reply,
-            #     'content': markdownify(reply.comment)
-            # })
             data = {
                 'recipient': content_object.author,
                 'verb': 'reply',
-                'action_object': reply,
-                'target': content_object.author,
-                # 'description': description
+                'target': reply,
             }
 
             notify.send(sender=reply.user, **data)
 
+        action.send(reply.user, verb='reply', action_object=content_object, target=reply)
         reply.save()
-        action.send(reply.user, verb='reply', action_object=reply, target=content_object)
 
 
 moderator = Moderator()

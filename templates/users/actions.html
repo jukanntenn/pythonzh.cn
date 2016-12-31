@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 
 {% load bootstrap_pagination %}
-{% load follow_tags %}
+{% load forum_tags %}
 
 {% block main %}
     <main class="col-md-8 mb-1">
         <ul class="list-group">
             {% block post_list_head %}
                 <li class="list-group-item">
-                    <span class="pull-right">喜欢总数 {{ like_list.count }}</span>
+                    <span class="pull-right">动态总数 {{ action_list.count }}</span>
                     <nav>
                         <a href="{% url 'forum:index' %}">django forum demo</a> >
                         <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >
-                        <a>全部喜欢</a>
+                        <a>全部的动态</a>
                     </nav>
                 </li>
             {% endblock post_list_head %}
 
-            {% for like in page_obj %}
+            {% for feed in page_obj %}
                 <li class="list-group-item">
-                    {{ like|follow }}
+                    {{ feed|action }}
                 </li>
             {% empty %}
-                <li class="list-group-item">你还没有喜欢什么</li>
+                <li class="list-group-item">还没有动态</li>
             {% endfor %}
-            {% if like_list and paginator.num_pages > 1 %}
+            {% if action_list and paginator.num_pages > 1 %}
                 {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
             {% endif %}
         </ul>

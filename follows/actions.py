@@ -19,6 +19,7 @@ def follow(user, obj, ftype, send_action=True, actor_only=True, **kwargs):
         content_type=ContentType.objects.get_for_model(obj),
         actor_only=actor_only,
         ftype=ftype)
+
     if send_action and created:
         action.send(user, verb=ftype, target=obj, **kwargs)
 
@@ -32,7 +33,7 @@ def follow(user, obj, ftype, send_action=True, actor_only=True, **kwargs):
     return instance
 
 
-def unfollow(user, obj, ftype, send_action=False):
+def unfollow(user, obj, ftype, send_action=True):
     check(obj)
     Follow.objects.filter(
         user=user, object_id=obj.pk,

@@ -9,8 +9,8 @@ from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 
 from notifications.views import AllNotificationsList
-
 from braces.views import UserFormKwargsMixin
+from actstream.signals import action
 
 from categories.models import Category
 from .models import Post
@@ -63,14 +63,21 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
         return initial
 
     def post(self, request, *args, **kwargs):
+
+        # TODO：add rate limit
         try:
             latest_post = self.request.user.post_set.all().latest('created')
-            if latest_post.created + timezone.timedelta(minutes=5) > timezone.now():
-                return HttpResponseForbidden('您的发帖时间间隔小于 5 分钟，请稍微休息一会')
+            if latest_post.created + timezone.timedelta(seconds=5) > timezone.now():
+                return HttpResponseForbidden('您的发帖时间间隔小于 5 秒钟，请稍微休息一会')
         except Post.DoesNotExist:
             pass
 
         return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        action.send(self.request.user, verb='post', target=self.object)
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,6 +112,11 @@ class PostEditView(LoginRequiredMixin, UpdateView):
         form = super().get_form(form_class=form_class)
         form.helper.form_action = urlresolvers.reverse('forum:edit', kwargs={'pk': self.kwargs.get('pk')})
         return form
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        action.send(self.request.user, verb='edit', target=self.object)
+        return response
 
 
 class NotificationsListView(AllNotificationsList):

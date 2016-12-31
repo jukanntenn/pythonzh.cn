@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, UpdateView, DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
@@ -51,13 +51,28 @@ class UserDetailView(DetailView):
         posts = self.object.post_set.all().order_by('-created')[:10]
         replies = self.object.reply_comments.all().order_by('-submit_date')[:10]
 
-        user_streams = actor_stream(self.object).exclude(verb__regex=r'^un[a-z]+$')[:20]
+        actions = actor_stream(self.object)[:20]
 
         context.update({
             'post_list': posts,
             'reply_list': replies,
-            'user_streams': user_streams,
+            'action_list': actions,
         })
+        return context
+
+
+class UserActionView(ListView):
+    paginate_by = 30
+    model = Action
+    template_name = 'users/actions.html'
+
+    def get_queryset(self):
+        return actor_stream(get_object_or_404(User, username=self.kwargs.get('username')))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username=self.kwargs.get('username'))
+        context['user'] = user
         return context
 
 
@@ -118,10 +133,16 @@ class UserFeedView(LoginRequiredMixin, ListView):
     context_object_name = 'feed_list'
     template_name = 'users/feeds.html'
 
+    # TODO: 只显示用户订阅后的动态，订阅前不显示
     def get_queryset(self):
-        user_watch = [follow.follow_object.pk for follow in self.request.user.follows.filter(ftype='watch')]
-        user_follow = [follow.follow_object.pk for follow in self.request.user.follows.filter(ftype='follow')]
+        user_watch = [follow for follow in self.request.user.follows.filter(ftype='watch')]
+        user_follow = [follow for follow in self.request.user.follows.filter(ftype='follow')]
+
+        user_watch_id = [follow.follow_object.pk for follow in user_watch]
+        user_follow_id = [follow.follow_object.pk for follow in user_follow]
 
         return super().get_queryset().filter(
-            Q(actor_object_id__in=user_follow) | Q(target_object_id__in=user_watch, verb='reply')).order_by(
+            Q(actor_object_id__in=user_follow_id) | Q(action_object_object_id__in=user_watch_id,
+                                                      verb='reply') | Q(target_object_id__in=user_watch_id,
+                                                                        verb='edit')).order_by(
             '-timestamp')

@@ -78,34 +78,16 @@
                 <li class="list-group-item font-weight-bold">
                     用户最新动态
                 </li>
-                {% comment %}
-                    <li class="list-group-item">
-                        <time class="text-muted small">1 天前</time>
-                        <div>
-                            在用户 <a href="">追梦人物</a> 发布的帖子
-                            <a href="">三个臭非官方个</a> 中回复了
-                        </div>
-                        <div class="mark">
-                            快乐的 sublime
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <time class="text-muted small">16 小时前</time>
-                        <div>
-                            发布了新帖子 <a href="">我是新人，求馆长</a>
-                        </div>
-                    </li>
-                {% endcomment %}
 
-                {% for stream in user_streams %}
+                {% for act in action_list %}
                     <li class="list-group-item">
-                        {{ stream|stream }}
+                        {{ act|action }}
                     </li>
                 {% empty %}
                     <li class="list-group-item">该用户下没有动态</li>
                 {% endfor %}
-                {% if not user_streams.count < 20 %}
-                    <li class="list-group-item small"><a href=""
+                {% if not action_list.count < 20 %}
+                    <li class="list-group-item small"><a href="{% url 'users:actions' user.username %}"
                                                          class="text-muted">{{ user.nickname }}
                         的全部动态>></a></li>
                 {% endif %}

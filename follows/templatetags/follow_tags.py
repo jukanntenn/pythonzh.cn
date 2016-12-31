@@ -23,9 +23,9 @@ def follower_count(obj, ftype):
 
 
 @register.filter
-def action(obj):
+def follow(obj):
     ftype = obj.ftype
-    tmpl = getattr(settings, 'ACTION_TEMPLATES')[ftype]
+    tmpl = getattr(settings, 'FOLLOW_TEMPLATES')[ftype]
     context = {
         'like': obj,
         'follow_object': obj.follow_object,

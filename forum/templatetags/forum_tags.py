@@ -81,9 +81,9 @@ def describe(obj):
 
 
 @register.filter
-def stream(obj):
+def action(obj):
     verb = obj.verb
-    tmpl = getattr(settings, 'STREAM_TEMPLATES')[verb]
+    tmpl = getattr(settings, 'ACTION_TEMPLATES')[verb]
     context = {
         'actor': obj.actor,
         'target': obj.target,

@@ -200,25 +200,34 @@ NOTIFICATION_TEMPLATES = {
     'follow': 'notifications/follow.html',
 }
 
-STREAM_TEMPLATES = {
-    'follow': 'actstream/follow.html',
-    'watch': 'actstream/watch.html',
-    'praise': 'actstream/praise.html',
-    'favorite': 'actstream/favorite.html',
-    'reply': 'actstream/reply.html',
+ACTION_TEMPLATES = {
+    'follow': 'actstream/actions/follow.html',
+    'watch': 'actstream/actions/watch.html',
+    'praise': 'actstream/actions/praise.html',
+    'favorite': 'actstream/actions/favorite.html',
+    'reply': 'actstream/actions/reply.html',
+    'post': 'actstream/actions/post.html',
+    'edit': 'actstream/actions/edit.html',
+    'unfollow': 'actstream/actions/unfollow.html',
+    'unwatch': 'actstream/actions/unwatch.html',
+    'unpraise': 'actstream/actions/unpraise.html',
+    'unfavorite': 'actstream/actions/unfavorite.html',
+    'unreply': 'actstream/actions/unreply.html',
 }
 
-ACTION_TEMPLATES = {
+FOLLOW_TEMPLATES = {
     'watch': 'follows/watch.html',
     'praise': 'follows/praise.html',
 }
 
 FEED_TEMPLATES = {
-    'watch': 'feeds/watch.html',
-    'follow': 'feeds/follow.html',
-    'praise': 'feeds/praise.html',
-    'favorite': 'feeds/favorite.html',
-    'reply': 'feeds/reply.html',
+    'watch': 'actstream/feeds/watch.html',
+    'follow': 'actstream/feeds/follow.html',
+    'praise': 'actstream/feeds/praise.html',
+    'favorite': 'actstream/feeds/favorite.html',
+    'reply': 'actstream/feeds/reply.html',
+    'post': 'actstream/feeds/post.html',
+    'edit': 'actstream/feeds/edit.html',
 }
 
 USE_PAGEDOWN = False

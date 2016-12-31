@@ -1,25 +1,5 @@
 {% load forum_tags %}
 
-{% comment %}
-<div class="media">
-    <a class="media-left" href="{{ user.get_absolute_url }}">
-        <img class="media-object" src="{{ user.mugshot_thumbnail.url }}"
-             alt="" style="width: 24px;">
-    </a>
-    <div class="media-body">
-        <div class="media-heading">
-            用户 <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a>
-            在对帖子
-            <a href="{{ post.get_absolute_url }}#c{{ reply.pk }}">{{ post.title }}</a>
-            的回复中 @ 了你：
-        </div>
-        <div class="mark">
-            {{ content|bleach }}
-        </div>
-    </div>
-</div>
-{% endcomment %}
-
 <div class="media">
     <a class="media-left" href="{{ actor.get_absolute_url }}">
         <img class="media-object" src="{{ actor.mugshot_thumbnail.url }}"
@@ -27,16 +7,16 @@
     </a>
     <div class="media-body">
         <div class="media-heading">
-            用户 <a href="{{ user.get_absolute_url }}">{{ actor.nickname }}</a>
+            用户 <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
             在对帖子
-            <a href="{{ action_obj.content_object.get_absolute_url }}#c{{ action_obj.pk }}"
+            <a href="{{ target.content_object.get_absolute_url }}#c{{ target.pk }}"
                data-state="{% if notification.unread %}1{% else %}0{% endif %}"
                data-target="{% url 'notifications:mark_as_read' notification.slug %}" class="notification-jump">
-                {{ action_obj.content_object.title }}</a>
+                {{ target.content_object.title }}</a>
             的回复中 @ 了你：
         </div>
         <div class="mark">
-            {{ action_obj.comment|parse_nicknames|mark|bleach }}
+            {{ target.comment|parse_nicknames|mark|bleach }}
         </div>
     </div>
 </div>

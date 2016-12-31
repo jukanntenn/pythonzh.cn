@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^(?P<username>[\w.@+-]+)/posts/$', views.UserPostListView.as_view(), name='posts'),
     url(r'^(?P<username>[\w.@+-]+)/replies/$', views.UserReplyListView.as_view(), name='replies'),
     url(r'^(?P<username>[\w.@+-]+)/likes/$', views.UserLikeView.as_view(), name='likes'),
+    url(r'^(?P<username>[\w.@+-]+)/actions/$', views.UserActionView.as_view(), name='actions'),
 ]
