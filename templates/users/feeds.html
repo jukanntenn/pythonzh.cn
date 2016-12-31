@@ -8,7 +8,7 @@
         <ul class="list-group">
             {% block post_list_head %}
                 <li class="list-group-item">
-                    <span class="pull-right">关注的动态总数 {{ like_list.count }}</span>
+                    <span class="pull-right">关注的动态总数 {{ feed_list.count }}</span>
                     <nav>
                         <a href="{% url 'forum:index' %}">django forum demo</a> >
                         <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >

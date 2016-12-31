@@ -1,3 +1,5 @@
+import itertools
+
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, UpdateView, DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -51,12 +53,15 @@ class UserDetailView(DetailView):
         posts = self.object.post_set.all().order_by('-created')[:10]
         replies = self.object.reply_comments.all().order_by('-submit_date')[:10]
 
-        actions = actor_stream(self.object)[:20]
+        actions = actor_stream(self.object)
+
+        if self.object != self.request.user:
+            actions = actions.exclude(verb__startswith='un')
 
         context.update({
             'post_list': posts,
             'reply_list': replies,
-            'action_list': actions,
+            'action_list': actions[:20],
         })
         return context
 
@@ -133,16 +138,23 @@ class UserFeedView(LoginRequiredMixin, ListView):
     context_object_name = 'feed_list'
     template_name = 'users/feeds.html'
 
-    # TODO: 只显示用户订阅后的动态，订阅前不显示
     def get_queryset(self):
-        user_watch = [follow for follow in self.request.user.follows.filter(ftype='watch')]
-        user_follow = [follow for follow in self.request.user.follows.filter(ftype='follow')]
+        user_watch = self.request.user.follows.filter(ftype='watch').values('content_type', 'object_id', 'started')
+        user_follow = self.request.user.follows.filter(ftype='follow').values('content_type', 'object_id', 'started')
 
-        user_watch_id = [follow.follow_object.pk for follow in user_watch]
-        user_follow_id = [follow.follow_object.pk for follow in user_follow]
+        qs = Action.objects.none()
+        action_qs = super().get_queryset()
 
-        return super().get_queryset().filter(
-            Q(actor_object_id__in=user_follow_id) | Q(action_object_object_id__in=user_watch_id,
-                                                      verb='reply') | Q(target_object_id__in=user_watch_id,
-                                                                        verb='edit')).order_by(
-            '-timestamp')
+        for watch in user_watch:
+            qs = qs | action_qs.filter(
+                Q(action_object_content_type=watch['content_type'], action_object_object_id=watch['object_id'],
+                  verb=r'reply',
+                  timestamp__gte=watch['started']) | Q(target_content_type=watch['content_type'],
+                                                       target_object_id=watch['object_id'],
+                                                       verb=r'edit',
+                                                       timestamp__gte=watch['started']))
+
+        for follow in user_follow:
+            qs = qs | action_qs.filter(actor_content_type=follow['content_type'], actor_object_id=follow['object_id'],
+                                       timestamp__gte=follow['started']).exclude(verb__startswith='un')
+        return qs.order_by('-timestamp')
