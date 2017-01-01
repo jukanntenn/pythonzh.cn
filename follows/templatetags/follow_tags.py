@@ -27,7 +27,7 @@ def follow(obj):
     ftype = obj.ftype
     tmpl = getattr(settings, 'FOLLOW_TEMPLATES')[ftype]
     context = {
-        'like': obj,
+        'follow': obj,
         'follow_object': obj.follow_object,
     }
     return render_to_string(tmpl, context=context)

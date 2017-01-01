@@ -17,7 +17,8 @@
                 </a>
             </button>
         {% endif %}
-        <a class="btn btn-sm btn-secondary" role="button"><span
+        <a class="btn btn-sm btn-secondary" role="button"
+           href="{% url 'users:followers' follow_object.username %}"><span
                 class="follow-number">{{ follow_object|follower_count:'follow' }}</span>
             人关注</a>
     </div>

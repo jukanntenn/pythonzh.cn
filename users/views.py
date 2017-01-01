@@ -211,3 +211,23 @@ class UserFollowView(ListView):
         user = User.objects.get(username=self.kwargs.get('username'))
         context['user'] = user
         return context
+
+
+class UserFollowerView(ListView):
+    model = Follow
+    paginate_by = 20
+    context_object_name = 'follower_list'
+    template_name = 'users/followers.html'
+
+    def get_queryset(self):
+        actor = User.objects.get(username=self.kwargs.get('username'))
+        return super().get_queryset().filter(ftype='follow',
+                                             content_type=ContentType.objects.get_for_model(actor),
+                                             object_id=actor.pk
+                                             ).order_by('-started')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username=self.kwargs.get('username'))
+        context['user'] = user
+        return context

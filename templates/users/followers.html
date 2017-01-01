@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% load bootstrap_pagination %}
+{% load follow_tags %}
+{% load forum_tags %}
+
+{% block main %}
+    <main class="col-md-8 mb-1">
+        <ul class="list-group">
+            {% block post_list_head %}
+                <li class="list-group-item">
+                    <span class="pull-right">粉丝数 {{ follower_list.count }}</span>
+                    <nav>
+                        <a href="{% url 'forum:index' %}">django forum demo</a> >
+                        <a href="{{ user.get_absolute_url }}">{{ user.nickname }}</a> >
+                        <a>全部粉丝</a>
+                    </nav>
+                </li>
+            {% endblock post_list_head %}
+
+            {% for follow in page_obj %}
+                <li class="list-group-item">
+                    <div class="media">
+                        <div class="media-left">
+                            <img class="media-object" src="{{ follow.user.mugshot_thumbnail.url }}" alt=""
+                                 style="width: 48px;">
+                        </div>
+                        <div class="media-body">
+                            <div class="media-heading">{{ follow.user.nickname }}</div>
+                            <p>{{ follow.user.signature }}</p>
+                            {% if request.user != follow.user %}
+                                {% is_following request.user follow.user 'follow' as follow_flag %}
+                                <button class="btn btn-sm btn-outline-info
+                            {% if follow_flag %} unfollow-btn{% else %} follow-btn{% endif %}"
+                                        data-contenttype-id="{{ follow.user|ctype_id }}"
+                                        data-object-id="{{ follow.user.pk }}">
+                                    <a href="">
+                                        {% if follow_flag %}
+                                            <i class="fa fa-check" aria-hidden="true"></i> 已关注
+                                        {% else %}
+                                            <i class="fa fa-plus" aria-hidden="true"></i> 关注
+                                        {% endif %}
+                                    </a>
+                                </button>
+                            {% endif %}
+                            <a class="btn btn-sm btn-secondary" role="button"
+                               href="{% url 'users:followers' follow.user.username %}"><span
+                                    class="follow-number">{{ follow.user|follower_count:'follow' }}</span>
+                                人关注</a>
+                        </div>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">还没有粉丝哦</li>
+            {% endfor %}
+            {% if follower_list and paginator.num_pages > 1 %}
+                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% endif %}
+        </ul>
+    </main>
+{% endblock main %}
+
+{% block script %}
+    <script>
+        function follow(e) {
+            var $this = $(this);
+            var $ctypeId = $this.attr('data-contenttype-id');
+            var $objectId = $this.attr('data-object-id');
+            var $url = '/follows/follow_all/' + $ctypeId + '/' + $objectId + '/follow/';
+            $.post(
+                $url,
+                {
+                    content_type_id: $ctypeId,
+                    object_id: $objectId,
+                    ftype: 'follow'
+                },
+                function (data, status) {
+                    $this.find('a').first().html('<i class="fa fa-check" aria-hidden="true"></i> 已关注');
+                    var $followNumber = $this.next().first().find('.follow-number').first();
+                    $followNumber.text(parseInt($followNumber.text()) + 1);
+                    $this.off('click');
+                    $this.on('click', unfollow)
+                }
+            );
+            e.preventDefault();
+        }
+
+        function unfollow(e) {
+            var $this = $(this);
+            var $ctypeId = $this.attr('data-contenttype-id');
+            var $objectId = $this.attr('data-object-id');
+            var $url = '/follows/unfollow_all/' + $ctypeId + '/' + $objectId + '/follow/';
+            $.post(
+                $url,
+                {
+                    content_type_id: $ctypeId,
+                    object_id: $objectId,
+                    ftype: 'follow'
+                },
+                function (data, status) {
+                    $this.find('a').first().html('<i class="fa fa-plus" aria-hidden="true"></i> 关注');
+                    var $followNumber = $this.next().first().find('.follow-number').first();
+                    $followNumber.text(parseInt($followNumber.text()) - 1);
+                    $this.off('click');
+                    $this.on('click', follow)
+                }
+            );
+            e.preventDefault();
+        }
+
+        $('.follow-btn').on('click', follow);
+        $('.unfollow-btn').on('click', unfollow);
+    </script>
+{% endblock script %}
