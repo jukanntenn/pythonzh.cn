@@ -17,16 +17,26 @@
                 </li>
             {% endblock post_list_head %}
 
-            {% for like in page_obj %}
+            {% for watch in page_obj %}
                 <li class="list-group-item">
-                    {{ like|follow }}
+                    {{ watch|follow }}
                 </li>
             {% empty %}
                 <li class="list-group-item">你还没有喜欢什么</li>
             {% endfor %}
-            {% if like_list and paginator.num_pages > 1 %}
+            {% if watch_list and paginator.num_pages > 1 %}
                 {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
             {% endif %}
         </ul>
     </main>
 {% endblock main %}
+
+{% block script %}
+    <script>
+        $(".unwatch-btn").click(function () {
+            $.post($(this).attr("href"), {});
+            $(this).parent().parent().parent().parent().remove();
+            return false
+        });
+    </script>
+{% endblock script %}

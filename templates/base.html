@@ -187,16 +187,25 @@
                                         收藏列表</a>
                                 </li>
                                 <li class="list-group-item">
-                                    <a href="{% url 'users:likes' request.user.username %}"><i class="fa fa-heart"
+                                    <a href="{% url 'users:watch' request.user.username %}"><i class="fa fa-heart"
                                                                                                aria-hidden="true"></i>
-                                        我的喜欢</a>
+                                        我喜欢的帖子</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="{% url 'users:praise' request.user.username %}"><i class="fa fa-thumbs-up"
+                                                                                                aria-hidden="true"></i>
+                                        我赞过的回复</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="{% url 'users:follows' request.user.username %}"><i class="fa fa-users"
+                                                                                                 aria-hidden="true"></i>
+                                        我关注的人</a>
                                 </li>
                                 <li class="list-group-item">
                                     <a href="{% url 'users:feed' %}"><i class="fa fa-feed"
                                                                         aria-hidden="true"></i>
                                         我关注的动态</a>
                                 </li>
-
                             </ul>
                         {% else %}
                             <div class="card card-block">

@@ -5,6 +5,7 @@ from django.views.generic import TemplateView, UpdateView, DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 
 from actstream.models import actor_stream, Action
 
@@ -120,16 +121,40 @@ class UserFavoriteView(LoginRequiredMixin, ListView):
         return self.request.user.follows.filter(ftype='favorite').order_by('-started')
 
 
-class UserLikeView(ListView):
+class UserWatchView(ListView):
     model = Follow
     paginate_by = 20
-    context_object_name = 'like_list'
-    template_name = 'users/likes.html'
+    context_object_name = 'watch_list'
+    template_name = 'users/watch.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(Q(ftype='watch') | Q(ftype='praise'),
+        return super().get_queryset().filter(ftype='watch',
                                              user__username=self.kwargs.get('username')
                                              ).order_by('-started')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username=self.kwargs.get('username'))
+        context['user'] = user
+        return context
+
+
+class UserPraiseView(ListView):
+    model = Follow
+    paginate_by = 20
+    context_object_name = 'praise_list'
+    template_name = 'users/praise.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(ftype='praise',
+                                             user__username=self.kwargs.get('username')
+                                             ).order_by('-started')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username=self.kwargs.get('username'))
+        context['user'] = user
+        return context
 
 
 class UserFeedView(LoginRequiredMixin, ListView):
@@ -139,8 +164,17 @@ class UserFeedView(LoginRequiredMixin, ListView):
     template_name = 'users/feeds.html'
 
     def get_queryset(self):
-        user_watch = self.request.user.follows.filter(ftype='watch').values('content_type', 'object_id', 'started')
-        user_follow = self.request.user.follows.filter(ftype='follow').values('content_type', 'object_id', 'started')
+        user_ctype = ContentType.objects.get_for_model(self.request.user)
+        post_ctype = ContentType.objects.get_for_model(Post)
+        user_watch = self.request.user.follows.filter(
+            ftype='watch').exclude(
+            content_type=post_ctype,
+            object_id__in=self.request.user.post_set.all()).values(
+            'content_type', 'object_id',
+            'started')
+        user_follow = self.request.user.follows.filter(ftype='follow').exclude(content_type=user_ctype,
+                                                                               object_id=self.request.user.pk).values(
+            'content_type', 'object_id', 'started')
 
         qs = Action.objects.none()
         action_qs = super().get_queryset()
@@ -152,9 +186,28 @@ class UserFeedView(LoginRequiredMixin, ListView):
                   timestamp__gte=watch['started']) | Q(target_content_type=watch['content_type'],
                                                        target_object_id=watch['object_id'],
                                                        verb=r'edit',
-                                                       timestamp__gte=watch['started']))
+                                                       timestamp__gte=watch['started'])).exclude(
+                actor_content_type=user_ctype, actor_object_id=self.request.user.pk)
 
         for follow in user_follow:
             qs = qs | action_qs.filter(actor_content_type=follow['content_type'], actor_object_id=follow['object_id'],
                                        timestamp__gte=follow['started']).exclude(verb__startswith='un')
         return qs.order_by('-timestamp')
+
+
+class UserFollowView(ListView):
+    model = Follow
+    paginate_by = 20
+    context_object_name = 'follow_list'
+    template_name = 'users/follows.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(ftype='follow',
+                                             user__username=self.kwargs.get('username')
+                                             ).order_by('-started')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username=self.kwargs.get('username'))
+        context['user'] = user
+        return context

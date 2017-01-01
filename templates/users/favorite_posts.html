@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load bootstrap_pagination %}
+{% load forum_tags %}
 
 {% block main %}
     <main class="col-md-8 mb-1">
@@ -20,6 +21,12 @@
                 <li class="list-group-item">
                     {% block post_item %}
                         {% include 'forum/_post_item.html' with post=favorite.follow_object %}
+                        <button class="btn btn-sm btn-outline-info mt-1">
+                            <a class="unfavorite-btn"
+                               href="{% url 'follows:unfollow_all' content_type_id=favorite.follow_object|ctype_id object_id=favorite.follow_object.pk ftype='favorite' %}">
+                                <i class="fa fa-times" aria-hidden="true"></i> 取消收藏
+                            </a>
+                        </button>
                     {% endblock post_item %}
                 </li>
             {% empty %}
@@ -31,3 +38,13 @@
         </ul>
     </main>
 {% endblock main %}
+
+{% block script %}
+    <script>
+        $(".unfavorite-btn").click(function () {
+            $.post($(this).attr("href"), {});
+            $(this).parent().parent().remove();
+            return false
+        });
+    </script>
+{% endblock script %}

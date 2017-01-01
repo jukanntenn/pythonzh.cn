@@ -16,21 +16,22 @@
                     <h3 class="media-heading">{{ user.nickname }}</h3>
                     <p>{{ user.signature }}</p>
                     <div>django forum demo 第 {{ user.pk }} 号会员，加入于 {{ user.date_joined }}</div>
-                    {% is_following request.user user 'follow' as follow_flag %}
-
-                    <button class="btn btn-sm btn-outline-info mt-1
+                    {% if request.user != user %}
+                        {% is_following request.user user 'follow' as follow_flag %}
+                        <button class="btn btn-sm btn-outline-info mt-1
                             {% if follow_flag %} unfollow-btn{% else %} follow-btn{% endif %}"
-                            data-contenttype-id="{{ user|ctype_id }}"
-                            data-object-id="{{ user.pk }}">
-                        <a href="">
-                            {% if follow_flag %}
-                                <i class="fa fa-check" aria-hidden="true"></i> 已关注
-                            {% else %}
-                                <i class="fa fa-plus" aria-hidden="true"></i> 关注
-                            {% endif %}
-                        </a>
-                    </button>
-                    <a class="btn btn-sm btn-link mt-1" role="button"><span
+                                data-contenttype-id="{{ user|ctype_id }}"
+                                data-object-id="{{ user.pk }}">
+                            <a href="">
+                                {% if follow_flag %}
+                                    <i class="fa fa-check" aria-hidden="true"></i> 已关注
+                                {% else %}
+                                    <i class="fa fa-plus" aria-hidden="true"></i> 关注
+                                {% endif %}
+                            </a>
+                        </button>
+                    {% endif %}
+                    <a class="btn btn-sm btn-secondary mt-1" role="button"><span
                             class="follow-number">{{ user|follower_count:'follow' }}</span>
                         人关注</a>
                 </div>

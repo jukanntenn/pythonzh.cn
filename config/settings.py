@@ -218,6 +218,7 @@ ACTION_TEMPLATES = {
 FOLLOW_TEMPLATES = {
     'watch': 'follows/watch.html',
     'praise': 'follows/praise.html',
+    'follow': 'follows/follow.html',
 }
 
 FEED_TEMPLATES = {
