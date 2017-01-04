@@ -15,7 +15,7 @@
                         <nav class="media-heading">
                             <a href="{% url 'forum:index' %}">django forum demo</a> >
                             {% for category in category_ancestors %}
-                                <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a> >
+                                <a href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a> >
                             {% endfor %}
                             <a>{{ category }}</a>
                         </nav>
@@ -39,7 +39,7 @@
             <ul class="list-inline">
                 <li class="list-inline-item"><span class="">子分类：</span></li>
                 {% for c in category.children.all %}
-                    <li class="list-inline-item"><a href="{% url 'categories:posts' c.slug %}"
+                    <li class="list-inline-item"><a href="{% url 'forum:category_posts' c.slug %}"
                                                     class="tag tag-default">{{ c }}</a></li>
                 {% endfor %}
             </ul>
@@ -48,5 +48,5 @@
 {% endblock post_list_head %}
 
 {% block post_item %}
-    {% include 'categories/_category_post_item.html' %}
+    {% include 'forum/_category_post_item.html' %}
 {% endblock post_item %}

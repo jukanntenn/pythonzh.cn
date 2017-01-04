@@ -121,3 +121,34 @@ class PostEditView(LoginRequiredMixin, UpdateView):
 
 class NotificationsListView(AllNotificationsList):
     paginate_by = 10
+
+
+class CategoryPostListView(ListView):
+    paginate_orphans = 0
+    paginate_by = 25
+    template_name = 'forum/category_post_list.html'
+
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        self.category = get_object_or_404(Category, slug=slug, is_removed=False)
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.category.post_set.all().annotate(
+            latest_reply_time=Coalesce(Max('replies__submit_date'), 'created')).order_by(
+            '-pinned',
+            '-latest_reply_time')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_ancestors = self.category.get_ancestors(include_self=True)
+        category_children = self.category.children.visible()
+        form = PostCreationForm(initial={'category': self.category})
+
+        context.update({
+            'category': self.category,
+            'category_ancestors': category_ancestors,
+            'category_children': category_children,
+            'form': form
+        })
+        return context
