@@ -93,3 +93,6 @@ ENV/
 database/
 media/
 .idea/
+
+# Database files
+db.sqlite3
