@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'pagedown',
     'actstream',
     'follows',
+    'mptt',
 ]
 
 COMMENTS_APP = 'replies'

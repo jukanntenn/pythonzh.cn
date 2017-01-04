@@ -15,8 +15,8 @@ class Cover(TimeStampedModel):
                                      options={'quality': 80})
 
     def __str__(self):
-        return 'Cover-{0}: {1}'.format(self.pk, self.caption or self.cover.name)
+        return self.cover
 
     class Meta:
-        verbose_name = 'Cover'
-        verbose_name_plural = 'Covers'
+        verbose_name = 'cover'
+        verbose_name_plural = 'covers'
