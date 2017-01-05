@@ -35,7 +35,7 @@ class CategoryPostListViewTestCase(TestCase):
 
         response = self.client.get(reverse('forum:category_posts', kwargs={'slug': category.slug}))
         self.assertQuerysetEqual(response.context['category_ancestors'],
-                                 ['<Category: ancestor category>', '<Category: category>'])
+                                 ['<Category: ancestor category>'])
         self.assertEqual(response.context['category'], category)
         self.assertQuerysetEqual(response.context['category_children'], ['<Category: child category>'])
         self.assertIsInstance(response.context['form'], PostCreationForm)

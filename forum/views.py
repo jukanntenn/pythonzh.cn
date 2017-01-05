@@ -141,7 +141,7 @@ class CategoryPostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category_ancestors = self.category.get_ancestors(include_self=True)
+        category_ancestors = self.category.get_ancestors()
         category_children = self.category.children.visible()
         form = PostCreationForm(initial={'category': self.category})
 

@@ -11,7 +11,7 @@
                     </li>
                     {% get_categories as category_list %}
                     {% for category in category_list %}
-                        <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                        <li class="list-inline-item"><a href="{% url 'forum:category_posts' category.slug %}"
                                                         class="btn btn-sm btn-outline-success">{{ category }}</a></li>
                     {% endfor %}
                 </ul>
@@ -19,9 +19,8 @@
                 {% if quick_categoriy_list %}
                     <ul class="list-inline text-muted" style="margin-top: 16px">
                         快速浏览：
-
                         {% for category in quick_categoriy_list %}
-                            <li class="list-inline-item"><a href="{% url 'categories:posts' category.slug %}"
+                            <li class="list-inline-item"><a href="{% url 'forum:category_posts' category.slug %}"
                                                             class="tag tag-default">{{ category }}</a></li>
                         {% endfor %}
                     </ul>

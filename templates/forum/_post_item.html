@@ -14,7 +14,7 @@
         </h6>
         <ul class="list-inline text-muted small">
             {% block category %}
-                <li class="list-inline-item"><a href="{% url 'categories:posts' post.category.slug %}"
+                <li class="list-inline-item"><a href="{% url 'forum:category_posts' post.category.slug %}"
                                                 class="tag tag-default">{{ post.category }}</a>
                 </li>
             {% endblock category %}
