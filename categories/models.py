@@ -8,12 +8,12 @@ from mptt.managers import TreeManager, TreeQuerySet
 
 
 class CategoryQuerySet(TreeQuerySet, SoftDeletableQuerySet):
-    pass
+    def visible(self):
+        return self.filter(is_removed=False)
 
 
 class CategoryManager(TreeManager):
-    def visible(self):
-        return self.filter(is_removed=False)
+    pass
 
 
 class Category(MPTTModel, TimeStampedModel, SoftDeletableModel):

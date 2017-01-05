@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_comments.abstracts import CommentAbstractModel
 
-from forum.mark import markdownify
+from forum.utils import mark
 from forum.utils import parse_nicknames
 
 
@@ -13,4 +13,4 @@ class Reply(CommentAbstractModel):
 
     @property
     def reply_html(self):
-        return markdownify(parse_nicknames(self.comment))
+        return mark(parse_nicknames(self.comment))

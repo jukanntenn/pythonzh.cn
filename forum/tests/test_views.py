@@ -22,10 +22,6 @@ class CategoryPostListViewTestCase(TestCase):
         response = self.client.get(reverse('forum:category_posts', kwargs={'slug': 'category-test'}))
         self.assertTemplateUsed(response, 'forum/category_post_list.html')
 
-        # def test_do_not_display_posts_in_removed_category(self):
-        #     removed_category = Category.objects.create(name='removed', slug='removed', is_removed=True)
-        #     visible_category = Category.objects.create(name='visible', slug='visible')
-
     def test_get_context_data(self):
         ancestor_category = Category.objects.create(name='ancestor category', slug='ancestor-category', )
         category = Category.objects.create(name='category', slug='category', parent=ancestor_category)

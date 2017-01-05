@@ -8,7 +8,6 @@ from notifications.signals import notify
 from actstream.signals import action
 
 from users.models import User
-from forum.mark import markdownify
 
 
 class Moderator(DjangoCommentModerator):

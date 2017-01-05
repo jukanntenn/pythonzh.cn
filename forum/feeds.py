@@ -5,7 +5,7 @@ from django.db.models import Max
 from django.utils.feedgenerator import Atom1Feed
 
 from .models import Post
-from .mark import markdownify
+from .utils import mark
 from .templatetags.forum_tags import bleach_value
 
 
@@ -24,7 +24,7 @@ class AllPostsRssFeed(Feed):
         return '[%s] %s' % (item.category, item.title)
 
     def item_description(self, item):
-        return bleach_value(markdownify(item.body))
+        return bleach_value(mark(item.body))
 
 
 class AllPostsAtomFeed(AllPostsRssFeed):

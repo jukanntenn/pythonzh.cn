@@ -19,15 +19,12 @@ from .forms import PostCreationForm, PostEditForm
 
 class IndexView(ListView):
     paginate_orphans = 5
-    paginate_by = 20
+    paginate_by = 25
     model = Post
     template_name = 'forum/index.html'
 
     def get_queryset(self):
-        query = super().get_queryset().filter(is_removed=False).annotate(
-            latest_reply_time=Coalesce(Max('replies__submit_date'), 'created')).order_by(
-            '-pinned',
-            '-latest_reply_time')
+        query = Post.objects.visible().ordered()
 
         return query
 
@@ -141,14 +138,14 @@ class CategoryPostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category_ancestors = self.category.get_ancestors()
-        category_children = self.category.children.visible()
+        ancestors = self.category.get_ancestors()
+        children = self.category.children.visible()
         form = PostCreationForm(initial={'category': self.category})
 
         context.update({
             'category': self.category,
-            'category_ancestors': category_ancestors,
-            'category_children': category_children,
+            'category_ancestors': ancestors,
+            'category_children': children,
             'form': form
         })
         return context
