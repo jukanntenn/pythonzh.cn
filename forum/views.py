@@ -24,7 +24,7 @@ class IndexView(ListView):
     template_name = 'forum/index.html'
 
     def get_queryset(self):
-        query = Post.objects.visible().ordered()
+        query = super().get_queryset().visible().ordered()
 
         return query
 
@@ -37,6 +37,9 @@ class PostDetailView(DetailView):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
         self.object.increase_views()
         return response
+
+    def get_queryset(self):
+        return super().get_queryset().visible()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

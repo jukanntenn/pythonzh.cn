@@ -22,7 +22,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <a href="{% url 'categories:posts' post.category.slug %}">{{ post.category }}</a>
+                <a href="{% url 'forum:category_posts' post.category.slug %}">{{ post.category }}</a>
             </nav>
             <div class="card-block">
                 <a href="{{ post.author.get_absolute_url }}" class="pull-right"><img
