@@ -1,8 +1,9 @@
 import re
-import markdown
 import bleach
+import markdown
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
 from users.models import User
 
@@ -40,3 +41,7 @@ def mark(value, extensions=markdown_extensions, extension_configs=markdown_exten
 
 def bleach_value(value):
     return bleach.clean(value, **bleach_args)
+
+
+def get_ctype_pk(obj):
+    return ContentType.objects.get_for_model(obj).pk

@@ -41,32 +41,33 @@ class PostDetailView(DetailView):
     def get_queryset(self):
         return super().get_queryset().visible()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        post_ctype_id = ContentType.objects.get_for_model(self.object).pk
-        context['post_ctype_id'] = post_ctype_id
-        return context
-
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     form_class = PostCreationForm
     template_name = 'forum/post_form.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        self.category = None
+
+        if slug:
+            self.category = get_object_or_404(Category, slug=slug, is_removed=False)
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         initial = super().get_initial()
-        slug = self.kwargs.get('slug')
 
-        if not slug:
+        if not self.category:
             return initial
-        category = get_object_or_404(Category, slug=slug)
-        initial['category'] = category
+
+        initial['category'] = self.category
         return initial
 
     def post(self, request, *args, **kwargs):
-
         # TODO：add rate limit
         try:
-            latest_post = self.request.user.post_set.all().latest('created')
+            latest_post = self.request.user.post_set.visible().latest('created')
             if latest_post.created + timezone.timedelta(seconds=5) > timezone.now():
                 return HttpResponseForbidden('您的发帖时间间隔小于 5 秒钟，请稍微休息一会')
         except Post.DoesNotExist:
@@ -82,12 +83,10 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # TODO: duplicated query
-        slug = self.kwargs.get('slug')
-        if not slug:
+        if not self.category:
             return context
-        category = get_object_or_404(Category, slug=slug)
-        context['category'] = category
+
+        context['category'] = self.category
         return context
 
 
@@ -98,6 +97,8 @@ class PostEditView(LoginRequiredMixin, UpdateView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
+
+        # TODO: use a more elegent way
         if self.request.user != self.object.author:
             return HttpResponseForbidden('只有帖子的作者才能编辑该帖子')
         return response

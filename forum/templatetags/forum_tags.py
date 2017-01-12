@@ -13,12 +13,15 @@ from django.contrib.contenttypes.models import ContentType
 
 from categories.models import Category
 from ..models import Post
-from ..utils import parse_nicknames, bleach_value, mark
+from ..utils import parse_nicknames, bleach_value, mark, get_ctype_pk
 
 register = template.Library()
 
 register.filter('bleach', bleach_value)
 register.filter('mark', mark)
+register.filter('parse_nicknames', parse_nicknames)
+
+register.simple_tag(get_ctype_pk, name='get_ctype_pk')
 
 
 @register.simple_tag
@@ -81,13 +84,3 @@ def feed(obj):
         'timestamp': obj.timestamp
     }
     return render_to_string(tmpl, context=context)
-
-
-@register.filter(name='parse_nicknames')
-def parse_nicknames_filter(value):
-    return parse_nicknames(value)
-
-
-@register.filter
-def ctype_id(obj):
-    return ContentType.objects.get_for_model(obj).pk

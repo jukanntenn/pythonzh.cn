@@ -8,7 +8,7 @@
                 <a href="{% url 'forum:index' %}">django forum demo</a>
                 >
                 {% if category %}
-                    <a href="{% url 'categories:posts' category.slug %}">{{ category }}</a>
+                    <a href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a>
                     >
                 {% endif %}
                 <a>发布新帖子</a>

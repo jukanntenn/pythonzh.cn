@@ -45,31 +45,20 @@
                 {% if post.body %}
                     <hr>
                     <div class="post-body">
-                        {{ post.body_html|bleach }}
+                        {{ post.body|mark|bleach|safe }}
                     </div>
                 {% endif %}
             </div>
             <div class="card-footer">
                 <ul class="list-inline mb-0">
-                    {% comment %}
-                    <li class="list-inline-item">
-                        {% is_following request.user post 'favorite' as favorite_flag %}
-                            <a href="javascript:"
-                           class="{% if favorite_flag %}unfavorite-btn{% else %}favorite-btn{% endif %}"
-                           role="button" data-contenttype-id="{{ post_ctype_id }}"
-                           data-object-id="{{ post.pk }}">{% if favorite_flag %}
-                            <i class="fa fa-star" aria-hidden="true"></i> 已收藏{% else %}
-                            <i class="fa fa-star-o" aria-hidden="true"></i> 收藏{% endif %}
-                            （{{ post|follower_count:'favorite' }}）</a>
-                    </li>
-                    {% endcomment %}
+                    {% get_ctype_pk post as post_ctype_pk %}
                     <li class="list-inline-item small">
                         {% is_following request.user post 'favorite' as favorite_flag %}
-                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_id object_id=post.pk ftype='favorite' %}"
+                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='favorite' %}"
                            role="button" id="favorite-btn"
                            {% if favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star-o"
                                                                                      aria-hidden="true"></i> 收藏</a>
-                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_id object_id=post.pk ftype='favorite' %}"
+                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='favorite' %}"
                            role="button" id="unfavorite-btn"
                            {% if not favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star"
                                                                                          aria-hidden="true"></i> 已收藏</a>
@@ -77,11 +66,11 @@
                     </li>
                     <li class="list-inline-item small">
                         {% is_following request.user post 'watch' as watch_flag %}
-                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_id object_id=post.pk ftype='watch' %}"
+                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='watch' %}"
                            role="button" id="watch-btn"
                            {% if watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart-o"
                                                                                   aria-hidden="true"></i> 喜欢</a>
-                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_id object_id=post.pk ftype='watch' %}"
+                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='watch' %}"
                            role="button" id="unwatch-btn"
                            {% if not watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart"
                                                                                       aria-hidden="true"></i> 已喜欢</a>
@@ -116,18 +105,19 @@
                                 <li class="pull-right">{{ forloop.counter }} 楼</li>
                             </ul>
                             <div class="">
-                                {{ reply.reply_html|bleach }}
+                                {{ reply.comment|parse_nicknames|mark|bleach|safe }}
                             </div>
                             <ul class="list-inline text-muted small">
+                                {% get_ctype_pk reply as reply_ctype_pk %}
                                 <li class="list-inline-item">
                                     {% is_following request.user reply 'praise' as praise_flag %}
-                                    <a href="{% url 'follows:follow_all' content_type_id=reply|ctype_id object_id=reply.pk ftype='praise' %}"
+                                    <a href="{% url 'follows:follow_all' content_type_id=reply_ctype_pk object_id=reply.pk ftype='praise' %}"
                                        class="thumbup-btn"
                                        role="button"
                                        {% if praise_flag %}style="display: none"{% endif %}>
                                         <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
                                     </a>
-                                    <a href="{% url 'follows:unfollow_all' content_type_id=reply|ctype_id object_id=reply.pk ftype='praise' %}"
+                                    <a href="{% url 'follows:unfollow_all' content_type_id=reply_ctype_pk object_id=reply.pk ftype='praise' %}"
                                        class="unthumbup-btn"
                                        role="button"
                                        {% if not praise_flag %}style="display: none"{% endif %}>

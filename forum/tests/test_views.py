@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.conf import settings
 
 from categories.models import Category
 from users.models import User
@@ -99,5 +100,41 @@ class PostDetailViewTestCase(TestCase):
 
         self.assertEqual(post.views, 1)
 
-    def test_get_context_data(self):
-        pass
+
+class PostCreateViewTestCase(TestCase):
+    def test_redirect_anonymous_user_to_login_url(self):
+        response = self.client.get(reverse('forum:create'))
+        self.assertEqual(response.status_code, 302)
+        # self.assertEqual(response.url, settings.LOGIN_URL)
+
+    def test_use_correct_template(self):
+        User.objects.create_user(username='testuser', email='test@test.com', password='test8888')
+        self.client.login(username='testuser', password='test8888')
+        response = self.client.get(reverse('forum:create'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'forum/post_form.html')
+
+    def test_no_initial_category(self):
+        User.objects.create_user(username='testuser', email='test@test.com', password='test8888')
+        self.client.login(username='testuser', password='test8888')
+        response = self.client.get(reverse('forum:create'))
+        self.assertIs(response.context['form'].initial.get('category'), None)
+
+    def test_has_initial_category(self):
+        User.objects.create_user(username='testuser', email='test@test.com', password='test8888')
+        category = Category.objects.create(name='test category', slug='test-category')
+
+        self.client.login(username='testuser', password='test8888')
+        response = self.client.get(reverse('forum:create', kwargs={'slug': category.slug}))
+        self.assertEqual(response.context['form'].initial.get('category'), category)
+
+    def test_has_a_removed_or_non_exist_category(self):
+        User.objects.create_user(username='testuser', email='test@test.com', password='test8888')
+        category = Category.objects.create(name='removed category', slug='removed-category', is_removed=True)
+
+        self.client.login(username='testuser', password='test8888')
+        response = self.client.get(reverse('forum:create', kwargs={'slug': category.slug}))
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get(reverse('forum:create', kwargs={'slug': 'non-exist'}))
+        self.assertEqual(response.status_code, 404)
