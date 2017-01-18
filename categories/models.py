@@ -2,17 +2,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel, SoftDeletableModel
-from model_utils.managers import SoftDeletableManager, SoftDeletableQuerySet
+from model_utils.managers import SoftDeletableManager
 from mptt.models import MPTTModel, TreeForeignKey
-from mptt.managers import TreeManager, TreeQuerySet
+from mptt.managers import TreeManager
 
 
-class CategoryQuerySet(TreeQuerySet, SoftDeletableQuerySet):
-    def visible(self):
-        return self.filter(is_removed=False)
-
-
-class CategoryManager(TreeManager):
+class CategoryManager(TreeManager, SoftDeletableManager):
     pass
 
 
@@ -23,10 +18,11 @@ class Category(MPTTModel, TimeStampedModel, SoftDeletableModel):
     name = models.CharField(_('name'), max_length=255, unique=True)
     cover = models.OneToOneField('covers.Cover', verbose_name=_('cover'), blank=True, null=True,
                                  on_delete=models.SET_NULL)
-    slug = models.SlugField(_('slug'), max_length=255, unique=True)
+    slug = models.SlugField(_('slug'), max_length=255, unique=True, allow_unicode=True)
     description = models.TextField(_('description'), blank=True)
 
-    objects = CategoryManager.from_queryset(CategoryQuerySet)()
+    objects = models.Manager()
+    public = CategoryManager()
 
     class Meta:
         verbose_name = _('category')
