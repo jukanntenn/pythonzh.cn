@@ -15,9 +15,6 @@ from replies.models import Reply
 
 
 class PostQuerySet(SoftDeletableQuerySet):
-    def visible(self):
-        return self.filter(is_removed=False, category__is_removed=False)
-
     def ordered(self):
         return self.annotate(
             latest_reply_time=Coalesce(Max('replies__submit_date'), 'created')).order_by(
@@ -25,8 +22,9 @@ class PostQuerySet(SoftDeletableQuerySet):
             '-latest_reply_time')
 
 
-class PostManager(models.Manager):
-    pass
+class PostManager(models.Manager.from_queryset(PostQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_removed=False, category__is_removed=False)
 
 
 class Post(TimeStampedModel, SoftDeletableModel):
@@ -42,7 +40,8 @@ class Post(TimeStampedModel, SoftDeletableModel):
     replies = GenericRelation(Reply, object_id_field='object_pk', content_type_field='content_type',
                               verbose_name=_('replies'))
 
-    objects = PostManager.from_queryset(PostQuerySet)()
+    objects = models.Manager()
+    public = PostManager()
 
     class Meta:
         verbose_name = _('post')
