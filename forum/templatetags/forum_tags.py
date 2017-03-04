@@ -20,6 +20,7 @@ register = template.Library()
 register.filter('bleach', bleach_value)
 register.filter('mark', mark)
 register.filter('parse_nicknames', parse_nicknames)
+register.filter('get_ctype_pk', get_ctype_pk)
 
 register.simple_tag(get_ctype_pk, name='get_ctype_pk')
 

@@ -23,7 +23,7 @@
                         {% include 'forum/_post_item.html' with post=favorite.follow_object %}
                         <button class="btn btn-sm btn-outline-info mt-1">
                             <a class="unfavorite-btn"
-                               href="{% url 'follows:unfollow_all' content_type_id=favorite.follow_object|ctype_id object_id=favorite.follow_object.pk ftype='favorite' %}">
+                               href="{% url 'follows:unfollow_all' content_type_id=favorite.follow_object|get_ctype_pk object_id=favorite.follow_object.pk ftype='favorite' %}">
                                 <i class="fa fa-times" aria-hidden="true"></i> 取消收藏
                             </a>
                         </button>

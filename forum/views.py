@@ -24,8 +24,7 @@ class IndexView(ListView):
     template_name = 'forum/index.html'
 
     def get_queryset(self):
-        query = super().get_queryset().visible().ordered()
-
+        query = super().get_queryset().all()
         return query
 
 
@@ -37,9 +36,6 @@ class PostDetailView(DetailView):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
         self.object.increase_views()
         return response
-
-    def get_queryset(self):
-        return super().get_queryset().visible()
 
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
@@ -67,7 +63,7 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
     def post(self, request, *args, **kwargs):
         # TODO：add rate limit
         try:
-            latest_post = self.request.user.post_set.visible().latest('created')
+            latest_post = self.request.user.post_set.latest('created')
             if latest_post.created + timezone.timedelta(seconds=5) > timezone.now():
                 return HttpResponseForbidden('您的发帖时间间隔小于 5 秒钟，请稍微休息一会')
         except Post.DoesNotExist:
@@ -143,7 +139,7 @@ class CategoryPostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ancestors = self.category.get_ancestors()
-        children = self.category.children.visible()
+        children = self.category.children.all()
         form = PostCreationForm(initial={'category': self.category})
 
         context.update({

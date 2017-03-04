@@ -15,16 +15,14 @@ from replies.models import Reply
 
 
 class PostQuerySet(SoftDeletableQuerySet):
-    def ordered(self):
+    def order(self):
         return self.annotate(
             latest_reply_time=Coalesce(Max('replies__submit_date'), 'created')).order_by(
             '-pinned',
             '-latest_reply_time')
 
-
-class PostManager(models.Manager.from_queryset(PostQuerySet)):
     def get_queryset(self):
-        return super().get_queryset().filter(is_removed=False, category__is_removed=False)
+        return super().filter(is_removed=False, category__is_removed=False)
 
 
 class Post(TimeStampedModel, SoftDeletableModel):
@@ -41,7 +39,7 @@ class Post(TimeStampedModel, SoftDeletableModel):
                               verbose_name=_('replies'))
 
     objects = models.Manager()
-    public = PostManager()
+    public = PostQuerySet.as_manager()
 
     class Meta:
         verbose_name = _('post')

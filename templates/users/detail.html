@@ -20,7 +20,7 @@
                         {% is_following request.user user 'follow' as follow_flag %}
                         <button class="btn btn-sm btn-outline-info mt-1
                             {% if follow_flag %} unfollow-btn{% else %} follow-btn{% endif %}"
-                                data-contenttype-id="{{ user|ctype_id }}"
+                                data-contenttype-id="{{ user|get_ctype_pk }}"
                                 data-object-id="{{ user.pk }}">
                             <a href="">
                                 {% if follow_flag %}

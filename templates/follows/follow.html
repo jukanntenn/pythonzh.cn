@@ -12,7 +12,7 @@
         {% if request.user != follow_object %}
             <button class="btn btn-sm btn-outline-info">
                 <a class="unfollow-btn"
-                   href="{% url 'follows:unfollow_all' content_type_id=follow_object|ctype_id object_id=follow_object.pk ftype='follow' %}">
+                   href="{% url 'follows:unfollow_all' content_type_id=follow_object|get_ctype_pk object_id=follow_object.pk ftype='follow' %}">
                     <i class="fa fa-times" aria-hidden="true"></i> 取消关注
                 </a>
             </button>
