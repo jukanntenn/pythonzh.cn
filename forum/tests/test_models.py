@@ -118,7 +118,7 @@ class PostTestCase(TestCase):
             created=now - timezone.timedelta(minutes=5)
         )
 
-        self.assertQuerysetEqual(Post.public.ordered(), [
+        self.assertQuerysetEqual(Post.public.all_ordered(), [
             '<Post: post has no reply created at now>',
             '<Post: post has a reply created at 1 minutes ago>',
             '<Post: post has a reply created at 3 minutes ago>',

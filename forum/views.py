@@ -6,7 +6,6 @@ from django.db.models import Max
 from django.db.models.functions import Coalesce
 from django.core import urlresolvers
 from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
 
 from notifications.views import AllNotificationsList
 from braces.views import UserFormKwargsMixin
@@ -24,8 +23,7 @@ class IndexView(ListView):
     template_name = 'forum/index.html'
 
     def get_queryset(self):
-        query = super().get_queryset().all()
-        return query
+        return Post.public.all_ordered()
 
 
 class PostDetailView(DetailView):
@@ -36,6 +34,9 @@ class PostDetailView(DetailView):
         response = super(PostDetailView, self).get(request, *args, **kwargs)
         self.object.increase_views()
         return response
+
+    def get_queryset(self):
+        return Post.public.all()
 
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):

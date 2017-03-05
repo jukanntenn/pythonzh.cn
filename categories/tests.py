@@ -24,7 +24,7 @@ class CategoryTestCase(TestCase):
 
         self.assertQuerysetEqual(Category.public.all(), ['<Category: visible>'])
 
-    def test_soft_bulk_delete(self):
+    def test_soft_bulk_delete_objects(self):
         Category.objects.create(name='category-1', slug='category-1')
         Category.objects.create(name='category-2', slug='category-2')
 
@@ -33,7 +33,7 @@ class CategoryTestCase(TestCase):
         self.assertQuerysetEqual(Category.objects.all().order_by('name'),
                                  ['<Category: category-1>', '<Category: category-2>'])
 
-    def test_soft_object_delete(self):
+    def test_soft_delete_object(self):
         category = Category.objects.create(name='category', slug='category')
         category.delete()
         self.assertEqual(Category.public.count(), 0)

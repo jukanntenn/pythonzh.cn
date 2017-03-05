@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from model_utils.models import TimeStampedModel, SoftDeletableModel
-from model_utils.managers import SoftDeletableManager
+from model_utils.models import TimeStampedModel, SoftDeletableModel, SoftDeletableManager
 from mptt.models import MPTTModel, TreeForeignKey
 from mptt.managers import TreeManager
 
@@ -21,7 +20,7 @@ class Category(MPTTModel, TimeStampedModel, SoftDeletableModel):
     slug = models.SlugField(_('slug'), max_length=255, unique=True, allow_unicode=True)
     description = models.TextField(_('description'), blank=True)
 
-    objects = models.Manager()
+    objects = TreeManager()
     public = CategoryManager()
 
     class Meta:
