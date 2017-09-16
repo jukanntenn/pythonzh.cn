@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block main %}
+    <div class="col-md-3">
+        <ul class="list-group mt-3">
+            <li class="list-group-item">
+                <a href="{% url 'users:settings' %}">
+                    <i class="fa fa-user-circle mr-2" aria-hidden="true"></i>基本资料
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="{% url 'account_change_password' %}">
+                    <i class="fa fa-key mr-2" aria-hidden="true"
+                    ></i>{% if user.has_usable_password %}修改密码{% else %}设置密码{% endif %}
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="{% url 'account_email' %}">
+                    <i class="fa fa-envelope mr-2" aria-hidden="true"></i>邮箱设置
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="{% url 'socialaccount_connections' %}">
+                    <i class="fa fa-cogs mr-2" aria-hidden="true"></i>账号关联
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock main %}
+{% block aside %}
+    <div class="col-md-9">
+        {% block card %}
+        {% endblock card %}
+    </div>
+{% endblock aside %}

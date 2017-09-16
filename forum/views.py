@@ -1,29 +1,65 @@
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseForbidden
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.http import HttpResponseForbidden, JsonResponse
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max
 from django.db.models.functions import Coalesce
-from django.core import urlresolvers
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+from django.views.decorators.csrf import csrf_exempt
 
+from actstream import actions
+from actstream.views import respond
+from actstream.compat import get_model
+from actstream.signals import action
+from actstream.registry import check
 from notifications.views import AllNotificationsList
 from braces.views import UserFormKwargsMixin
-from actstream.signals import action
+from notifications.signals import notify
 
 from categories.models import Category
 from .models import Post
 from .forms import PostCreationForm, PostEditForm
+from .utils import markdown_value, bleach_value, parse_nicknames
+from .mixins import PaginationMixin
 
 
-class IndexView(ListView):
+class AboutView(TemplateView):
+    template_name = 'forum/about.html'
+
+
+class ContactView(TemplateView):
+    template_name = 'forum/contact.html'
+
+
+class DonateView(TemplateView):
+    template_name = 'forum/donate.html'
+
+
+class ContentPreviewView(View):
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        raw_content = self.request.POST.get('content')
+        preview_content = ''
+        if raw_content:
+            preview_content = parse_nicknames(markdown_value(bleach_value(raw_content)))
+
+        return JsonResponse({'preview': preview_content})
+
+
+class IndexView(PaginationMixin, ListView):
     paginate_orphans = 5
-    paginate_by = 25
+    paginate_by = 20
     model = Post
     template_name = 'forum/index.html'
 
     def get_queryset(self):
-        return Post.public.all_ordered()
+        return Post.public.all().natural_order()
 
 
 class PostDetailView(DetailView):
@@ -37,6 +73,12 @@ class PostDetailView(DetailView):
 
     def get_queryset(self):
         return Post.public.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ctype = ContentType.objects.get_for_model(self.object)
+        context['ctype'] = ctype
+        return context
 
 
 class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
@@ -74,7 +116,6 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        action.send(self.request.user, verb='post', target=self.object)
         return response
 
     def get_context_data(self, **kwargs):
@@ -90,40 +131,39 @@ class PostCreateView(LoginRequiredMixin, UserFormKwargsMixin, CreateView):
 class PostEditView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostEditForm
-    template_name = 'forum/post_form.html'
+    template_name = 'forum/post_edit_form.html'
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
 
         # TODO: use a more elegent way
-        if self.request.user != self.object.author:
+        if self.request.user != self.object.author and not request.user.is_superuser:
             return HttpResponseForbidden('只有帖子的作者才能编辑该帖子')
         return response
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        if self.request.user != self.object.author:
+        if self.request.user != self.object.author and not request.user.is_superuser:
             return HttpResponseForbidden('只有帖子的作者才能编辑该帖子')
         return response
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
-        form.helper.form_action = urlresolvers.reverse('forum:edit', kwargs={'pk': self.kwargs.get('pk')})
         return form
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        action.send(self.request.user, verb='edit', target=self.object)
         return response
 
 
-class NotificationsListView(AllNotificationsList):
-    paginate_by = 10
+class NotificationsListView(PaginationMixin, AllNotificationsList):
+    paginate_by = 20
+    paginate_orphans = 5
 
 
-class CategoryPostListView(ListView):
-    paginate_orphans = 0
-    paginate_by = 25
+class CategoryPostListView(PaginationMixin, ListView):
+    paginate_orphans = 5
+    paginate_by = 20
     template_name = 'forum/category_post_list.html'
 
     def get(self, request, *args, **kwargs):
@@ -132,10 +172,8 @@ class CategoryPostListView(ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.category.post_set.all().annotate(
-            latest_reply_time=Coalesce(Max('replies__submit_date'), 'created')).order_by(
-            '-pinned',
-            '-latest_reply_time')
+        cates = self.category.get_descendants(include_self=True)
+        return Post.public.filter(category__in=cates).natural_order()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -150,3 +188,59 @@ class CategoryPostListView(ListView):
             'form': form
         })
         return context
+
+    def get_template_names(self):
+        names = super().get_template_names()
+
+        if not self.category.parent:
+            names.insert(0, 'forum/index.html')
+
+        return names
+
+
+RECIPIENT = {
+    'Post': 'author',
+    'Reply': 'user',
+}
+
+
+def follow(user, obj, send_action=True, actor_only=True, **kwargs):
+    check(obj)
+    follow_type = kwargs.pop('follow_type', '')
+    instance, created = get_model('actstream', 'follow').objects.get_or_create(
+        user=user, object_id=obj.pk, follow_type=follow_type,
+        content_type=ContentType.objects.get_for_model(obj),
+        actor_only=actor_only)
+    if send_action and created:
+        if not follow_type:
+            action.send(user, verb=_('started following'), target=obj, **kwargs)
+        else:
+            action.send(user, verb=_('started %s' % follow_type), target=obj, **kwargs)
+
+    if obj.__class__.__name__ not in RECIPIENT:
+        recipient = obj
+    else:
+        recipient = getattr(obj, RECIPIENT[obj.__class__.__name__], None)
+
+    if created and recipient and user != recipient:
+        if follow_type and not follow_type.startswith('un'):
+            notify.send(sender=user, recipient=recipient, verb=follow_type, target=obj)
+    return instance
+
+
+@login_required
+@csrf_exempt
+def follow_unfollow(request, content_type_id, object_id, do_follow=True, actor_only=True, send_action=True,
+                    follow_type=None):
+    ctype = get_object_or_404(ContentType, pk=content_type_id)
+    instance = get_object_or_404(ctype.model_class(), pk=object_id)
+
+    if do_follow:
+        if not follow_type:
+            follow(request.user, instance, actor_only=actor_only, send_action=send_action)
+        else:
+            follow(request.user, instance, actor_only=actor_only, send_action=send_action,
+                   follow_type=follow_type)
+        return respond(request, 201)  # CREATED
+    actions.unfollow(request.user, instance, follow_type=follow_type)
+    return respond(request, 204)  # NO CONTENT

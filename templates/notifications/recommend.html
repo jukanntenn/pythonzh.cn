@@ -1,0 +1,9 @@
+{% extends 'notifications/base.html' %}
+{% block description %}
+    <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
+    推荐了你的帖子
+    <a class="js-read" data-state="{% if notification.unread %}1{% else %}0{% endif %}"
+       href="{{ target.get_absolute_url }}">
+        {{ target.title }}
+    </a>
+{% endblock description %}

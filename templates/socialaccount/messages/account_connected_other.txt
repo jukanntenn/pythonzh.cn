@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}该社交账户已被关联到其它账户。{% endblocktrans %}

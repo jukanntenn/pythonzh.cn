@@ -1,0 +1,81 @@
+{% extends "users/base.html" %}
+{% load i18n %}
+{% block title %}邮箱设置 - Pythonzhcn{% endblock title %}
+{% block card %}
+    <div class="card mt-3">
+        <div class="card-header h5 font-weight-bold bg-primary text-white">邮箱设置</div>
+        <div class="card-block">
+            {% if user.emailaddress_set.all %}
+                <p>{% trans 'The following e-mail addresses are associated with your account:' %}</p>
+
+                <form action="{% url 'account_email' %}" class="email_list" method="post">
+                    {% csrf_token %}
+                    <fieldset class="blockLabels">
+                        {% for emailaddress in user.emailaddress_set.all %}
+                            <div class="ctrlHolder">
+                                <label for="email_radio_{{ forloop.counter }}"
+                                       class="{% if emailaddress.primary %}primary_email{% endif %}">
+
+                                    <input id="email_radio_{{ forloop.counter }}" type="radio" name="email"
+                                           {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{% endif %}
+                                           value="{{ emailaddress.email }}"/>
+
+                                    {{ emailaddress.email }}
+                                    {% if emailaddress.verified %}
+                                        <span class="verified bg-success text-white p-1 ml-2 small">{% trans "Verified" %}</span>
+                                    {% else %}
+                                        <span class="unverified bg-warning text-white p-1 ml-2 small">{% trans "Unverified" %}</span>
+                                    {% endif %}
+                                    {% if emailaddress.primary %}
+                                        <span class="primary bg-primary text-white p-1 ml-2 small">{% trans "Primary" %}</span>{% endif %}
+                                </label>
+                            </div>
+                        {% endfor %}
+
+                        <div class="buttonHolder">
+                            <button class="secondaryAction btn btn-sm btn-primary" type="submit"
+                                    name="action_primary">{% trans 'Make Primary' %}</button>
+                            <button class="secondaryAction btn btn-sm btn-info" type="submit"
+                                    name="action_send">{% trans 'Re-send Verification' %}</button>
+                            <button class="primaryAction btn btn-sm btn-danger" type="submit"
+                                    name="action_remove">{% trans 'Remove' %}</button>
+                        </div>
+                    </fieldset>
+                </form>
+            {% else %}
+                <p>
+                    <strong>{% trans 'Warning:' %}</strong> {% trans "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %}
+                </p>
+            {% endif %}
+            <hr>
+            <h3>{% trans "Add E-mail Address" %}</h3>
+
+            <form method="post" action="{% url 'account_email' %}" class="add_email mt-3">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                <button name="action_add" class="btn btn-primary btn-sm">添加邮箱</button>
+            </form>
+        </div>
+    </div>
+{% endblock card %}
+
+{% block script %}
+    <script type="text/javascript">
+        (function () {
+            var message = "{% trans 'Do you really want to remove the selected e-mail address?' %}";
+            var actions = document.getElementsByName('action_remove');
+            if (actions.length) {
+                actions[0].addEventListener("click", function (e) {
+                    if (!confirm(message)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+{% endblock %}

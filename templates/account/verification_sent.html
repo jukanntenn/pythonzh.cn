@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}验证邮箱地址 - Pythonzhcn{% endblock title %}
+
+{% block content %}
+    <h1 class="mt-3">{% trans "Verify Your E-mail Address" %}</h1>
+
+    <p>{% blocktrans %}验证邮件的链接已发送至您的注册邮箱，请登录您的邮箱查看。如果没有收到邮件，请检查垃圾箱或者使用刚才注册的账户直接登录，系统将重新发送验证链接。{% endblocktrans %}</p>
+{% endblock content %}

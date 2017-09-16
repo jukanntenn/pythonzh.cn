@@ -10,4 +10,8 @@ urlpatterns = [
     url(r'^post/(?P<pk>[0-9]+)/edit/$', views.PostEditView.as_view(), name='edit'),
     url(r'^notifications/$', views.NotificationsListView.as_view(), name='all'),
     url(r'^category/(?P<slug>[\w-]+)/$', views.CategoryPostListView.as_view(), name='category_posts'),
+    url(r'^about/$', views.AboutView.as_view(), name='about'),
+    url(r'^contact/$', views.ContactView.as_view(), name='contact'),
+    url(r'^donate/$', views.DonateView.as_view(), name='donate'),
+    url(r'^ajax/preview/$', views.ContentPreviewView.as_view(), name='preview'),
 ]

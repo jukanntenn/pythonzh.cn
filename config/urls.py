@@ -17,23 +17,31 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.contrib import admin
 from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 
-from users import views
+from forum.views import follow_unfollow
 from forum.feeds import AllPostsRssFeed, AllPostsAtomFeed
+from forum.sitemaps import sitemaps
 
 urlpatterns = [
+    # Follow/Unfollow API
+    url(r'^activity/follow/(?P<content_type_id>[^/]+)/(?P<object_id>[^/]+)/(?:(?P<follow_type>[^/]+)/)?$',
+        follow_unfollow, {'send_action': False}, name='actstream_follow'),
     url('', include('forum.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^users/', include('allauth.account.urls')),
-    url(r'^follows/', include('follows.urls')),
+    url(r'^user/', include('users.urls')),
+    url(r'^user/', include('allauth.urls')),
     url(r'^notifications/', include('notifications.urls', namespace='notifications')),
     url(r'^replies/', include('django_comments.urls')),
     url(r'^replies/', include('replies.urls')),
-    url(r'^users/', include('users.urls')),
-    url(r'^category/', include('categories.urls')),
     url(r'^captcha/', include('captcha.urls')),
+    url(r'^activity/', include('actstream.urls')),
     url(r'^all/rss/$', AllPostsRssFeed()),
     url(r'^all/atom/$', AllPostsAtomFeed()),
+    url(r'^robots\.txt', include('robots.urls')),
+    url(r'^sitemap\.xml$', sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

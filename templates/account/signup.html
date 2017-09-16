@@ -1,37 +1,27 @@
-{% extends "base.html" %}
-
-{% load crispy_forms_tags %}
-
+{% extends "account/base.html" %}
+{% block title %}注册 - Pythonzhcn{% endblock title %}
 {% block main %}
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header"><a href="{% url 'forum:index' %}">django forum demo</a> > <span>注册</span></div>
+        <div class="card mt-3">
+            <div class="card-header h5 font-weight-bold bg-primary text-white">新用户注册</div>
             <div class="card-block">
-                {% crispy form %}
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">其他登录方式</div>
-            <div class="card-block">
-                <p class="card-text">第三方登录功能正在开发中...</p>
+                <form action="{% url 'account_signup' %}" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{ field }}
+                            {{ field.errors }}
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-primary btn-sm" type="submit">注册</button>
+                    <a class="text-white btn btn-info btn-sm ml-2"
+                       href="{% url 'account_login' %}">已有账户登录</a>
+                </form>
+                <div class="mt-3">
+                    无法收到激活邮件？<a class="text-danger" href="http://pythonzh.cn/post/46/">点击这里</a>
+                    <div class="text-muted">Gmail 和 QQ 邮箱用户请尝试检查垃圾箱</div>
+                </div>
             </div>
         </div>
     </div>
 {% endblock main %}
-
-{% block script %}
-    <script>
-        $('#div_id_captcha').find('img').first().on('click', function () {
-            var $form = $(this).parents('form');
-
-            $.getJSON('/captcha/refresh/', {}, function (json) {
-                $form.find('input[name="captcha_0"]').val(json.key);
-                $form.find('img.captcha').attr('src', json.image_url);
-            });
-
-            return false;
-        });
-    </script>
-{% endblock script %}

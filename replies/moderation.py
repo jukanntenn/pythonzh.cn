@@ -1,11 +1,8 @@
 import re
 
 from django_comments.moderation import CommentModerator, Moderator as DjangoCommentModerator
-from django.template.loader import render_to_string
-from django.utils.html import mark_safe
 
 from notifications.signals import notify
-from actstream.signals import action
 
 from users.models import User
 
@@ -23,7 +20,7 @@ class ReplyModerator(CommentModerator):
 
         # 接受到评论会被 strip，不知道哪一步被处理的，临时为其补一个空格，防止@用户名在最后时无法解析
         reply.comment += ' '
-        nicknames = re.findall(r'@(?P<nickname>[a-zA-Z0-9\u4e00-\u9fa5]+) ', reply.comment)
+        nicknames = re.findall(r'@(?P<nickname>.+?) ', reply.comment)
         users = User.objects.filter(nickname__in=nicknames)
         reply.comment = reply.comment.strip()
 
@@ -61,7 +58,6 @@ class ReplyModerator(CommentModerator):
 
             notify.send(sender=reply.user, **data)
 
-        action.send(reply.user, verb='reply', action_object=content_object, target=reply)
         reply.save()
 
 

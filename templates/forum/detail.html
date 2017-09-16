@@ -2,149 +2,169 @@
 {% load staticfiles %}
 {% load comments %}
 {% load forum_tags %}
-{% load  follow_tags %}
-{% block style %}
-    <style>
-        #div_id_honeypot {
-            display: none;
-        }
-    </style>
-{% endblock style %}
+{% load activity_tags %}
+
+{% block title %}{{ post.title }} - Pythonzhcn{% endblock title %}
 {% block main %}
     <main class="col-md-8">
-        <div class="card post-detail">
-            <nav class="card-header">
-                <a href="{% url 'forum:index' %}">django forum demo</a> >
-                {% with ancestors=post.category.get_ancestors %}
-                    {% if ancestors %}
-                        {% for ancestor in ancestors %}
-                            <a href="">{{ ancestor }}</a> >
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                <a href="{% url 'forum:category_posts' post.category.slug %}">{{ post.category }}</a>
+        <div class="card mt-3">
+            <nav class="breadcrumb m-0 pb-0 bg-white">
+                <a class="breadcrumb-item" href="{% url 'forum:index' %}">Pythonzhcn</a>
+                {% for category in post.category.get_ancestors %}
+                    <a class="breadcrumb-item"
+                       href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a>
+                {% endfor %}
+                <a class="breadcrumb-item active"
+                   href="{% url 'forum:category_posts' post.category.slug %}">{{ post.category }}</a>
             </nav>
             <div class="card-block">
-                <a href="{{ post.author.get_absolute_url }}" class="pull-right"><img
-                        src="{{ post.author.mugshot_thumbnail.url }}"
-                        style="width: 73px;"></a>
-
-                <h3>{{ post.title }}</h3>
-                <ul class="list-inline text-muted small">
-                    <li class="list-inline-item"><a
-                            href="{{ post.author.get_absolute_url }}"><strong>{{ post.author.nickname }}</strong></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <time>{{ post.created|timesince }}前</time>
-                    </li>
-                    <li class="list-inline-item">{{ post.views }} 次点击</li>
-                    {% if post.author == request.user %}
-                        <li class="list-inline-item"><a href="{% url 'forum:edit' post.pk %}">编辑</a></li>
-                    {% endif %}
-                </ul>
+                <hr class="mt-0">
+                <div class="media">
+                    <div class="media-body">
+                        <h1 class="card-title h5 post-title font-weight-bold mt-0">{{ post.title }}</h1>
+                        <ul class="list-unstyled list-inline text-muted small list-dot-divider">
+                            <li class="list-inline-item m-0"><a class="text-muted"
+                                                                href="{{ post.author.get_absolute_url }}">{{ post.author.nickname }}</a>
+                            </li>
+                            <li class="list-inline-item m-0">
+                                <time datetime="{{ post.created }}">{{ post.created|timeago }}</time>
+                            </li>
+                            <li class="list-inline-item m-0">{{ post.views }} 次点击</li>
+                            {% if post.author == request.user or request.user.is_superuser %}
+                                <li class="list-inline-item m-0"><a href="{% url 'forum:edit' post.pk %}">编辑</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <a href="{{ post.author.get_absolute_url }}">
+                        <img class="d-flex ml-3 rounded mugshot-48" src="{{ post.author.mugshot_url }}"
+                             alt="">
+                    </a>
+                </div>
                 {% if post.body %}
-                    <hr>
-                    <div class="post-body">
+                    <hr class="mt-0">
+                    <div class="card-text">
                         {{ post.body|mark|bleach|safe }}
                     </div>
                 {% endif %}
             </div>
             <div class="card-footer">
-                <ul class="list-inline mb-0">
-                    {% get_ctype_pk post as post_ctype_pk %}
-                    <li class="list-inline-item small">
-                        {% is_following request.user post 'favorite' as favorite_flag %}
-                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='favorite' %}"
-                           role="button" id="favorite-btn"
-                           {% if favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star-o"
-                                                                                     aria-hidden="true"></i> 收藏</a>
-                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='favorite' %}"
-                           role="button" id="unfavorite-btn"
-                           {% if not favorite_flag %}style="display: none"{% endif %}><i class="fa fa-star"
-                                                                                         aria-hidden="true"></i> 已收藏</a>
-                        （<span id="favorite-number">{{ post|follower_count:'favorite' }}</span>）
-                    </li>
-                    <li class="list-inline-item small">
-                        {% is_following request.user post 'watch' as watch_flag %}
-                        <a href="{% url 'follows:follow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='watch' %}"
-                           role="button" id="watch-btn"
-                           {% if watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart-o"
-                                                                                  aria-hidden="true"></i> 喜欢</a>
-                        <a href="{% url 'follows:unfollow_all' content_type_id=post_ctype_pk object_id=post.pk ftype='watch' %}"
-                           role="button" id="unwatch-btn"
-                           {% if not watch_flag %}style="display: none"{% endif %}><i class="fa fa-heart"
-                                                                                      aria-hidden="true"></i> 已喜欢</a>
-                        （<span id="watch-number">{{ post|follower_count:'watch' }}</span>）
-                    </li>
+                {% is_following user post recommend as is_recommend %}
+                {% is_following user post unrecommend as is_unrecommend %}
+                <ul class="list-unstyled list-inline m-0">
+                    <li class="list-inline-item"><a
+                            class="btn btn-sm {% if is_recommend %}btn-danger text-white{% else %}btn-outline-secondary text-primary{% endif %}
+                            js-recommend {% if not user.is_authenticated %}nologin{% endif %} {% if user == post.author %}self{% endif %}"
+                            data-state="{% if is_recommend %}1{% else %}0{% endif %}"
+                            href="{% follow_url post recommend %}"><i
+                            class="fa fa-chevron-up mr-1"
+                            aria-hidden="true"></i><span>{% get_follow_count post 'recommend' %}</span></a></li>
+                    <li class="list-inline-item"><a
+                            class="btn btn-sm {% if is_unrecommend %}btn-danger text-white{% else %}btn-outline-secondary text-primary{% endif %}
+                            js-unrecommend {% if not user.is_authenticated %}nologin{% endif %} {% if user == post.author %}self{% endif %}"
+                            data-state="{% if is_unrecommend %}1{% else %}0{% endif %}"
+                            href="{% follow_url post unrecommend %}"><i
+                            class="fa fa-chevron-down mr-1"
+                            aria-hidden="true"></i><span>{% get_follow_count post 'unrecommend' %}</span></a></li>
+                    {% if user != post.author %}
+                        <li class="list-inline-item float-right">
+                            {% is_following user post favorite as is_favorite %}
+                            {% if is_favorite %}
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="{% url 'actstream_unfollow' content_type_id=ctype.pk object_id=post.pk follow_type='favorite' %}?next={{ request.path }}">
+                                    <i class="fa fa-bookmark mr-1" aria-hidden="true"></i>取消收藏</a>
+                            {% else %}
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="{% url 'actstream_follow' content_type_id=ctype.pk object_id=post.pk follow_type='favorite' %}?next={{ request.path }}">
+                                    <i class="fa fa-bookmark-o mr-1" aria-hidden="true"></i>收藏</a>
+                            {% endif %}
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
-        <ul class="list-group mb-1">
+        <ul class="list-group mt-3" id="comment-area">
             {% if post.replies.count %}
-                <li class="list-group-item small text-muted"><span>{{ post.replies.count }} 回复</span> |
-                    <span>直到 {{ post.latest_reply.submit_date }}</span></li>
+                <li class="list-group-item font-weight-bold">
+                    {{ post.replies.count }} 条回复
+                    <span class="mx-1">|</span>
+                    {{ post.participants_count }} 人参与
+                </li>
             {% else %}
                 <li class="list-group-item">目前还没有回复</li>
             {% endif %}
-            {% for reply in post.replies.all %}
+            {% for reply in post.get_replies %}
                 <li class="list-group-item" id="c{{ reply.pk }}">
-                    <div class="media">
-                        <a class="media-left" href="{{ reply.user.get_absolute_url }}">
-                            <img class="media-object" src="{{ reply.user.mugshot_thumbnail.url }}" alt=""
-                                 style="width: 48px;">
-                        </a>
-                        <div class="media-body">
-                            <ul class="list-inline text-muted small">
-                                <li class="list-inline-item"><a
-                                        href="{{ reply.user.get_absolute_url }}"><strong
-                                        class="nickname">{{ reply.user.nickname }}</strong></a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <time>{{ reply.submit_date|timesince }}前</time>
-                                </li>
-                                <li class="pull-right">{{ forloop.counter }} 楼</li>
-                            </ul>
-                            <div class="">
-                                {{ reply.comment|parse_nicknames|mark|bleach|safe }}
+                    <div class="w-100">
+                        <div class="row no-gutters">
+                            <div class="col-auto">
+                                <a href="{{ reply.user.get_absolute_url }}">
+                                    <img class="mr-2 mugshot-48 rounded hidden-xs-down"
+                                         src="{{ reply.user.mugshot_url }}"
+                                         alt="">
+                                    <img class="mr-2 mugshot-24 rounded hidden-sm-up"
+                                         src="{{ reply.user.mugshot_url }}"
+                                         alt="">
+                                </a>
                             </div>
-                            <ul class="list-inline text-muted small">
-                                {% get_ctype_pk reply as reply_ctype_pk %}
-                                <li class="list-inline-item">
-                                    {% is_following request.user reply 'praise' as praise_flag %}
-                                    <a href="{% url 'follows:follow_all' content_type_id=reply_ctype_pk object_id=reply.pk ftype='praise' %}"
-                                       class="thumbup-btn"
-                                       role="button"
-                                       {% if praise_flag %}style="display: none"{% endif %}>
-                                        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-                                    </a>
-                                    <a href="{% url 'follows:unfollow_all' content_type_id=reply_ctype_pk object_id=reply.pk ftype='praise' %}"
-                                       class="unthumbup-btn"
-                                       role="button"
-                                       {% if not praise_flag %}style="display: none"{% endif %}>
-                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                    </a>
-                                    <span class="praise-number">{{ reply|follower_count:'praise' }}</span>
-                                </li>
-                                ·
-                                {% if request.user.is_authenticated %}
-                                    <li class="list-inline-item">
-                                        <a href="javascript:" class="reply_btn"
-                                           data-nickname="{{ reply.user.nickname }}">回复</a>
+                            <div class="col">
+                                <div class="d-flex justify-content-between"><a class="text-muted"
+                                                                               href="{{ reply.user.get_absolute_url }}">{{ reply.user.nickname }}</a>
+                                    <small class="text-muted"># {{ forloop.counter }}</small>
+                                </div>
+                                <div class="py-1">
+                                    {{ reply.comment|parse_nicknames|mark|bleach|safe }}
+                                </div>
+                                <ul class="list-unstyled list-inline list-dot-divider w-100">
+                                    {% is_following user reply praise as is_praise %}
+                                    {% is_following user reply unpraise as is_unpraise %}
+                                    <li class="list-inline-item m-0 small">
+                                        <a href="{% follow_url reply praise %}"
+                                           class="js-up {% if not user.is_authenticated %}nologin{% endif %}
+                                            {% if user == reply.user %}self{% endif %}"
+                                           data-state="{% if is_praise %}1{% else %}0{% endif %}"><i
+                                                class="fa fa-thumbs-o-up mr-1 {% if is_praise %}text-danger{% endif %}"
+                                                aria-hidden="true"></i><span>{% get_follow_count reply 'praise' %}</span></a>
                                     </li>
-                                {% endif %}
-                            </ul>
+                                    <li class="list-inline-item m-0 small">
+                                        <a href="{% follow_url reply unpraise %}"
+                                           class="js-down {% if not user.is_authenticated %}nologin{% endif %}
+                                            {% if user == reply.user %}self{% endif %}"
+                                           data-state="{% if is_unpraise %}1{% else %}0{% endif %}"><i
+                                                class="fa fa-thumbs-o-down mr-1 {% if is_unpraise %}text-danger{% endif %}"
+                                                aria-hidden="true"></i><span>{% get_follow_count reply 'unpraise' %}</span></a>
+                                    </li>
+                                    <li class="list-inline-item m-0">
+                                        <time class="small text-muted">{{ reply.submit_date|timeago }}</time>
+                                    </li>
+                                    <li class="list-inline-item m-0">
+                                        <a class="small text-muted js-reply {% if not user.is_authenticated %}nologin{% endif %}"
+                                           href="#"
+                                           data-nickname="{{ reply.user.nickname }}"
+                                           data-parent="{{ reply.pk }}">回复
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </li>
             {% endfor %}
         </ul>
-        <div class="card">
-            <div class="card-header">添加一条新回复</div>
+        <div class="card mt-3">
+            <div class="card-header bg-white">
+                <span class="text-muted">添加一条新回复</span>
+            </div>
             <div class="card-block">
                 {% if user.is_authenticated %}
                     {% render_comment_form for post %}
                 {% else %}
-                    <a href="{% url 'account_login' %}?next={{ request.path }}">登录</a>以回复
+                    <div>
+                        请
+                        <a href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
+                        或者
+                        <a href="{% url 'account_signup' %}?next={{ request.path }}">注册</a>
+                        后发表回复
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -154,87 +174,193 @@
 {% block script %}
     <script>
         $(document).ready(function () {
-            $('.reply_btn').on('click', function () {
+            //回复
+            $('.js-reply').on('click', function (e) {
+                if ($(this).hasClass('nologin')) {
+                    alert("登录后才能回复");
+                    return false
+                }
+                var $nickname = $(this).attr('data-nickname');
+                var $parent = $(this).attr('data-parent');
+                var $mention = '@' + $nickname + ' ';
+                var $form = $('.form');
+                var $val = $form.find('textarea').val();
+                $form.find('textarea').val($val + $mention).focus();
+
+                if ($parent) {
+                    $form.find('#id_parent').val($parent)
+                }
+                return false
+            });
+
+            //防止表单重复提交
+            $('form').submit(function () {
+                $('#js-create').attr('disabled', true).val('发布中...');
+            });
+
+            // 赞同
+            $(".js-up").on('click', function () {
                 var $this = $(this);
-                var $nickname = '@' + $this.attr('data-nickname') + ' ';
-                var $replyArea = $('#div_id_comment').find('textarea').first();
-                $replyArea.val($replyArea.val() + $nickname).focus()
-            });
+                var $state = parseInt($this.attr('data-state'));
+                var $count = parseInt($this.find('span').text());
+                var $url = $this.attr("href");
+                var $urlBits = $url.split('/');
+                var $next = $this.parents('li.list-inline-item').next().find('a');
+                var $nextState = parseInt($next.attr('data-state'));
 
-
-            $('#id_reply_form').submit(function () {
-                $('#submit-id-submit').attr('disabled', true).val('正在提交...');
-            });
-
-
-            $("#favorite-btn, #unfavorite-btn").click(function () {
-                $.post($(this).attr("href"), {});
-                var $favoriteNumber = $(this).parent().find("#favorite-number").first().text();
-                if ($(this).attr("id") == "favorite-btn") {
-                    $(this).parent().find("#favorite-number").first().text(parseInt($favoriteNumber) + 1)
-                } else {
-                    $(this).parent().find("#favorite-number").first().text(parseInt($favoriteNumber) - 1)
+                if ($this.hasClass('nologin')) {
+                    alert("请在登录后执行该操作");
+                    return false
+                } else if ($this.hasClass('self')) {
+                    alert("自己不能给自己点赞");
+                    return false
                 }
-                $(this).parent().find("#favorite-btn, #unfavorite-btn").toggle();
+
+
+                if ($nextState) {
+                    $next.click();
+                }
+                $.post($url, {}, function () {
+                    if ($state) {
+                        $this.find('i').removeClass('text-danger');
+                        $this.find('span').text($count - 1);
+                        $this.attr('data-state', 0);
+                        $urlBits[2] = 'follow';
+                        $this.attr("href", $urlBits.join('/'))
+                    } else {
+                        $this.find('i').addClass('text-danger');
+                        $this.find('span').text($count + 1);
+                        $this.attr('data-state', 1);
+                        $urlBits[2] = 'unfollow';
+                        $this.attr("href", $urlBits.join('/'))
+                    }
+                });
                 return false
             });
 
-            $("#watch-btn, #unwatch-btn").click(function () {
-                $.post($(this).attr("href"), {});
+            // 反对
+            $(".js-down").on('click', function () {
+                var $this = $(this);
+                var $state = parseInt($this.attr('data-state'));
+                var $count = parseInt($this.find('span').text());
+                var $prev = $this.parents('li.list-inline-item').prev().find('a');
+                var $prevState = parseInt($prev.attr('data-state'));
+                var $url = $this.attr("href");
+                var $urlBits = $url.split('/');
 
-                var $watchNumber = $(this).parent().find("#watch-number").first().text();
-                if ($(this).attr("id") == "watch-btn") {
-                    $(this).parent().find("#watch-number").first().text(parseInt($watchNumber) + 1)
-                } else {
-                    $(this).parent().find("#watch-number").first().text(parseInt($watchNumber) - 1)
+                if ($this.hasClass('nologin')) {
+                    alert("请在登录后执行该操作");
+                    return false
+                } else if ($this.hasClass('self')) {
+                    alert("自己不能反对自己");
+                    return false
                 }
 
-                $(this).parent().find("#watch-btn, #unwatch-btn").toggle();
+                if ($prevState) {
+                    $prev.click();
+                }
+                $.post($url, {}, function () {
+                    if ($state) {
+                        $this.find('i').removeClass('text-danger');
+                        $this.find('span').text($count - 1);
+                        $this.attr('data-state', 0);
+                        $urlBits[2] = 'follow';
+                        $this.attr("href", $urlBits.join('/'))
+                    } else {
+                        $this.find('i').addClass('text-danger');
+                        $this.find('span').text($count + 1);
+                        $this.attr('data-state', 1);
+                        $urlBits[2] = 'unfollow';
+                        $this.attr("href", $urlBits.join('/'))
+                    }
+                });
                 return false
             });
 
-            $(".thumbup-btn, .unthumbup-btn").click(function () {
-                $.post($(this).attr("href"), {});
-                var $praiseNumber = $(this).parent().find(".praise-number").first().text();
-                if ($(this).attr("class") == "thumbup-btn") {
-                    $(this).parent().find(".praise-number").first().text(parseInt($praiseNumber) + 1)
-                } else {
-                    $(this).parent().find(".praise-number").first().text(parseInt($praiseNumber) - 1)
+            // 推荐
+            $(".js-recommend").on('click', function () {
+                var $this = $(this);
+                var $state = parseInt($this.attr('data-state'));
+                var $count = parseInt($this.find('span').text());
+                var $url = $this.attr("href");
+                var $urlBits = $url.split('/');
+                var $next = $this.parents('li.list-inline-item').next().find('a');
+                var $nextState = parseInt($next.attr('data-state'));
+
+                if ($this.hasClass('nologin')) {
+                    alert("请在登录后执行该操作");
+                    return false
+                } else if ($this.hasClass('self')) {
+                    alert("自己不能推荐自己的帖子");
+                    return false
                 }
-                $(this).parent().find(".thumbup-btn, .unthumbup-btn").toggle();
+
+                if ($nextState) {
+                    $next.click();
+                }
+                $.post($url, {}, function () {
+                    if ($state) {
+                        $this.removeClass('btn-danger text-white').addClass('btn-outline-secondary text-primary');
+                        $this.find('span').text($count - 1);
+                        $this.attr('data-state', 0);
+                        $urlBits[2] = 'follow';
+                        $this.attr("href", $urlBits.join('/'))
+                    } else {
+                        $this.removeClass('btn-outline-secondary text-primary').addClass('btn-danger text-white');
+                        $this.find('span').text($count + 1);
+                        $this.attr('data-state', 1);
+                        $urlBits[2] = 'unfollow';
+                        $this.attr("href", $urlBits.join('/'))
+                    }
+                });
                 return false
             });
 
-            /*
-             function thumbup() {
-             var $this = $(this);
-             $.post(
-             $(this).attr("href"),
-             {},
-             function (data, status) {
-             $this.off('click');
-             $this.on('click', unthumbup)
-             }
-             );
-             return false
-             }
+            // 不推荐
+            $(".js-unrecommend").on('click', function () {
+                var $this = $(this);
+                var $state = parseInt($this.attr('data-state'));
+                var $count = parseInt($this.find('span').text());
+                var $prev = $this.parents('li.list-inline-item').prev().find('a');
+                var $prevState = parseInt($prev.attr('data-state'));
+                var $url = $this.attr("href");
+                var $urlBits = $url.split('/');
 
-             function unthumbup() {
-             var $this = $(this);
-             $.post(
-             $(this).attr("href"),
-             {},
-             function (data, status) {
-             $this.off('click');
-             $this.on('click', thumbup)
-             }
-             );
-             return false
-             }
+                if ($this.hasClass('nologin')) {
+                    alert("请在登录后执行该操作");
+                    return false
+                } else if ($this.hasClass('self')) {
+                    alert("自己不能反对自己");
+                    return false
+                }
 
-             $('.thumbup-btn').on('click', thumbup);
-             $('.unthumbup-btn').on('click', unthumbup);
-             */
+                if ($prevState) {
+                    $prev.click();
+                }
+                $.post($url, {}, function () {
+                    if ($state) {
+                        $this.removeClass('btn-danger text-white').addClass('btn-outline-secondary text-primary');
+                        $this.find('span').text($count - 1);
+                        $this.attr('data-state', 0);
+                        $urlBits[2] = 'follow';
+                        $this.attr("href", $urlBits.join('/'))
+                    } else {
+                        $this.removeClass('btn-outline-secondary text-primary').addClass('btn-danger text-white');
+                        $this.find('span').text($count + 1);
+                        $this.attr('data-state', 1);
+                        $urlBits[2] = 'unfollow';
+                        $this.attr("href", $urlBits.join('/'))
+                    }
+                });
+                return false
+            });
+
+            // ctrl + enter 自动提交表单
+            $(document).keydown(function (e) {
+                if (e.which == 13 && e.ctrlKey) {
+                    $('form').submit();
+                }
+            });
         });
     </script>
 {% endblock script %}

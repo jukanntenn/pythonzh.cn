@@ -1,69 +1,93 @@
 {% extends 'base.html' %}
-{% load bootstrap_pagination %}
 {% load notifications_tags %}
 {% load forum_tags %}
+{% block title %}通知 - Pythonzhcn{% endblock title %}
 {% block main %}
     <main class="col-md-8">
-        <ul class="list-group">
-            <li class="list-group-item">
-
-
-                <nav class="row">
-                    <div class="col-md-6">
-                        <a href="{% url 'forum:index' %}">django forum demo</a> >
-                        <a>通知</a>
-                    </div>
-                    <div class="col-md-3 text-md-right">
-                        {% notifications_unread as unread_count %}
-                        {% if unread_count %}
-                            <a href="{% url 'notifications:mark_all_as_read' %}"
-                               class="btn btn-sm btn-outline-info">全部标为已读</a>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 text-md-right">
-                        <span class="text-muted small">总共收到提醒 {{ paginator.count }}</span>
-                    </div>
-                </nav>
+        <ul class="list-group mt-3">
+            <li class="list-group-item d-flex justify-content-between">
+                <h5 class="font-weight-bold">全部通知</h5>
+                {% notifications_unread as unread_count %}
+                <a class="text-white btn btn-warning btn-sm small {% if not unread_count %}disabled{% endif %}"
+                   href="{% url 'notifications:mark_all_as_read' %}" role="button">全部标为已读</a>
             </li>
             {% for notification in page_obj %}
                 <li class="list-group-item clearfix {% if notification.unread %}bg-faded{% endif %}">
                     {{ notification | describe }}
-                    <ul class="list-inline text-muted pull-right" style="margin-top: 5px">
-                        <li class="list-inline-item">
-                            <time class="small">{{ notification.timestamp|timesince }}前</time>
-                        </li>
-                        {% if notification.unread %}
-                            <li class="list-inline-item"><a
-                                    href="{% url 'notifications:mark_as_read' notification.slug %}"
-                                    class="tag tag-info mark-btn">标为已读</a></li>
-                        {% endif %}
-                        <li class="list-inline-item">
-                            <a href="{% url 'notifications:delete' notification.slug %}"
-                               class="tag tag-danger">删除</a></li>
-                    </ul>
                 </li>
             {% empty %}
                 <li class="list-group-item">
                     <span class="">暂无通知</span>
                 </li>
             {% endfor %}
-            {% if notifications and paginator.num_pages > 1 %}
-                {% bootstrap_paginate page_obj size='small' range=10 show_first_last='true' %}
+            {% if is_paginated %}
+                <li class="list-group-item">
+                    <nav aria-label="Page navigation example" class="w-100">
+                        <ul class="pagination pagination-sm justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if first %}
+                                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                            {% endif %}
+                            {% if left %}
+                                {% if left_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                                {% for i in left %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link"
+                                                            href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+                            </li>
+                            {% if right %}
+                                {% for i in right %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                                {% if right_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                            {% endif %}
+                            {% if last %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a>
+                                </li>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </li>
             {% endif %}
         </ul>
     </main>
 {% endblock main %}
-
 {% block script %}
     <script>
-        $('.notification-jump').on('click', function (e) {
-            var $this = $(this);
-            var $state = $this.attr('data-state');
-
-            if (parseInt($state)) {
-                var $target = $this.attr('data-target');
-                $.get($target);
-            }
+        $(document).ready(function () {
+            $('.js-read').on('click', function (e) {
+                var $this = $(this);
+                var $state = $this.attr('data-state');
+                if (parseInt($state)) {
+                    var $target = $this.parents('.list-group-item').find('.js-mark-as-read').attr('href');
+                    $.get($target);
+                    return true
+                }
+            })
         })
     </script>
 {% endblock script %}

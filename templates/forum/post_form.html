@@ -1,29 +1,73 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load crispy_forms_tags %}
-{% block main %}
-    <main class="col-md-8">
-        <div class="card">
-            <nav class="card-header">
-                <a href="{% url 'forum:index' %}">django forum demo</a>
-                >
-                {% if category %}
-                    <a href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a>
-                    >
-                {% endif %}
-                <a>发布新帖子</a>
-            </nav>
+{% block title %}发布新帖子 - Pythonzhcn{% endblock title %}
+{% block content %}
+    <main class="col-md-9">
+        <div class="card mt-3">
+            <div class="card-header">
+                <nav class="breadcrumb p-0 m-0 bg-faded">
+                    <a class="breadcrumb-item" href="{% url 'forum:index' %}">Pythonzhcn</a>
+                    {% if category %}
+                        <a class="breadcrumb-item"
+                           href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a>
+                    {% endif %}
+                    <a class="breadcrumb-item active">发布新帖子</a>
+                </nav>
+            </div>
             <div class="card-block">
-                {% crispy form %}
+                <form class="form" action="{% url 'forum:create' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {{ form.title.errors }}
+                        <small class="text-muted">{{ form.title.help_text }}</small>
+                    </div>
+                    <div class="form-group">
+                        {{ form.body.label_tag }}
+                        <div>
+                            <button type="button" class="btn btn-sm mr-2 bg-faded" id="js-edit">编辑</button>
+                            <button type="button" class="btn btn-sm bg-faded" id="js-preview">预览</button>
+                        </div>
+                        {{ form.body }}
+                        {{ form.body.errors }}
+                        <div class="preview-area p-1" id="js-preview-area"></div>
+                        <a class="text-muted small" href="http://www.appinn.com/markdown/index.html" target="_blank">使用
+                            Markdown 提供优雅排版<i
+                                    class="fa fa-question-circle ml-1"
+                                    aria-hidden="true"></i></a>
+                    </div>
+                    {% if not form.category.is_hidden %}
+                        <div class="form-group">
+                            {{ form.category.label_tag }}
+                            {{ form.category }}
+                            {{ form.category.errors }}
+                            <small class="text-muted">{{ form.category.help_text }}</small>
+                        </div>
+                    {% endif %}
+                    <button id="js-create" class="btn btn-primary btn-sm float-right" type="submit"><i
+                            class="fa fa-paper-plane mr-2"
+                            aria-hidden="true"></i>发表
+                    </button>
+                    <span class="small text-muted float-right mr-2">Ctrl/Command + 回车发表</span>
+                </form>
             </div>
         </div>
     </main>
-{% endblock main %}
+{% endblock content %}
 
 {% block script %}
     <script>
-        $('#id_create_form').submit(function () {
-            $('#submit-id-submit').attr('disabled', true).val('发布中...');
-        })
+        $('form').submit(function () {
+            $('#js-create').attr('disabled', true).val('发布中...');
+        });
+
+        // ctrl + enter 自动提交表单
+        $(document).keydown(function (e) {
+            if (e.which == 13 && e.ctrlKey) {
+                $('form').submit();
+            }
+        });
     </script>
 {% endblock script %}

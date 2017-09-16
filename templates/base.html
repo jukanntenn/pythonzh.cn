@@ -7,253 +7,355 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    {#    <link rel="stylesheet" href="{% static 'forum/css/bootstrap.min.css' %}">#}
-    <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 百度验证 -->
+    <meta name="baidu-site-verification" content="Y2JKmTtCPI"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'forum/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'forum/css/bootstrap.min.css' %}">
     <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'forum/css/friendly.css' %}">
     {% notifications_unread as unread_count %}
-    <title>{% if unread_count %}({{ unread_count }}){% endif %} django forum demo</title>
+    <title>{% if unread_count %}({{ unread_count }}) {% endif %}{% block title %}Pythonzhcn - Python
+        中文社区{% endblock title %}</title>
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .asteriskField {
-            color: red;;
-        }
-
-        blockquote {
-            position: relative;
-            color: #999;
-            font-weight: 400;
-            border-left: 1px solid #1abc9c;
-            padding-left: 1em;
-            margin: 1em 3em 1em 2em;
-        }
-
-        pre, code, pre tt {
-            font-family: Courier, 'Courier New', monospace;
-        }
-
-        pre {
-            background: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 1em 1.5em;
-            display: block;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* 简单地设置会使 meidia 失效 */
-        .post-body img {
+        img {
             max-width: 100%;
         }
 
-        /*
-        .post-item h6 > a {
-            color: #778087;
+        .bg-white {
+            background-color: #fff;
         }
 
-        .post-item .nickname,
-        .post-item h6 > a:hover,
-        .post-item .nickname:hover {
-            color: #4d5256;
-        }
-        */
-
-        a {
-            color: #778087;
+        .mugshot-24 {
+            width: 24px;
+            height: 24px;
         }
 
-        a:hover {
-            color: #4d5256;
+        .mugshot-48 {
+            width: 48px;
+            height: 48px;
         }
 
-        .post-body a {
-            text-decoration: underline;
+        .mugshot-96 {
+            width: 96px;
+            height: 96px;
         }
 
-        .media {
-            word-wrap: break-word;
-            word-break: break-all;
-            overflow: auto;
+        .post-title {
+            color: #555;
+            line-height: 1.3em;
         }
 
-        /* pagedown */
-        .wmd-wrapper .wmd-panel {
-            margin-left: 0;
-            margin-right: 0;
-            width: 100%;
-            min-width: 0;
+        .list-dot-divider li:not(:last-child):after {
+            content: ' ·';
+            font-size: 1em;
         }
 
-        .wmd-wrapper .wmd-input {
-            height: 15em;
-            width: 100%;
-            background-color: white;
-            border: solid 1px #cccccc;
+        #id_honeypot {
+            display: none;
         }
 
-        .wmd-wrapper .wmd-preview {
-            background-color: white;
+        .hot {
+            color: red;
         }
 
-        .wmd-wrapper .wmd-preview-title {
-            margin-top: 10px;
+        .pinned {
+            color: #ff7700;
         }
 
-        #id_comment_wmd_button_bar {
-            overflow: auto;
+        .highlight {
+            color: #b71ed7;
+        }
+
+        .cover-72 {
+            width: 72px;
+            height: 72px;
+        }
+
+        .cover-36 {
+            width: 36px;
+            height: 36px;
+        }
+
+        .errorlist {
+            color: red;
+        }
+
+        .py {
+            color: #fe2121;
+        }
+
+        .zhch {
+            color: #f2bf45;
+        }
+
+        .logo a:hover,
+        .logo a:active,
+        .logo a:focus,
+        .logo a:link,
+        .logo a:visited {
+            text-decoration: none;
+        }
+
+        .preview-area {
+            border: 1px solid #ccc;
+            display: none;
         }
     </style>
-    {% block style %}
-    {% endblock style %}
 </head>
-<body>
+<body class="bg-faded">
 <header>
-    <nav class="navbar navbar-light mb-2" style="background-color: #fff">
-        <div class="container">
-            <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse"
-                    data-target="#navbarResponsive"
-                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"></button>
-            <div class="collapse navbar-toggleable-md" id="navbarResponsive">
-                <a class="navbar-brand" href="{% url 'forum:index' %}">django forum demo</a>
-                <form class="form-inline float-lg-left">
-                    <input class="form-control" type="text" placeholder="搜索功能正在开发中...">
-                    <button class="btn btn-outline-success" type="submit">搜索</button>
-                </form>
-                <ul class="nav navbar-nav float-lg-right">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'forum:index' %}">首页 <span class="sr-only">(current)</span></a>
+    <nav class="navbar navbar-toggleable-md navbar-light bg-white">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand logo">
+            <a class="font-weight-bold h4" href="{% url 'forum:index' %}">
+                <span class="py">Python</span><span class="zhch">zhcn</span></a>
+        </h1>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            {% comment %}
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">头条</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">教程</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Wiki</a>
+                </li>
+            </ul>
+            {% endcomment %}
+            <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item mr-2">
+                        <a class="nav-link {% if unread_count %}text-danger{% endif %}"
+                           href="{% url 'notifications:all' %}">
+                            <i class="fa fa-bell" aria-hidden="true"></i>
+                            {% if unread_count %}
+                                <span class="small">{{ unread_count }} 条通知</span>
+                            {% endif %}
+                        </a>
                     </li>
-                    {% if request.user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:detail' request.user.username %}"><img
-                                    src="{{ request.user.mugshot_thumbnail.url }}" alt=""
-                                    style="width: 26px;"> {{ request.user.nickname }}</a>
+                    <li class="nav-item mr-2">
+                        <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{% url 'forum:create' %}">发布新帖子</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink1"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="mugshot-24 rounded-circle" src="{{ user.mugshot_url }}" alt="">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink1">
+                            <a class="dropdown-item" href="{{ user.get_absolute_url }}">{{ user.nickname }}</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'users:settings' %}">设置</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'account_logout' %}?next={{ request.path }}">登出</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account_signup' %}">注册</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
+{% if messages %}
+    <ul class="list-unstyled m-0">
+        {% for message in messages %}
+            <li>
+                <div class="alert alert-success alert-dismissible fade show m-0 text-center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>{{ message }}</strong>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<div class="container">
+    <div class="row">
+        {% block content %}
+            {% block main %}
+            {% endblock main %}
+            {% block aside %}
+                <aside class="col-md-4">
+                    <div class="card card-block mt-3">
+                        <a class="h6 mb-0 " href="{% url 'forum:create' %}"><i class="fa fa-plus mr-2"
+                                                                               aria-hidden="true"></i>快速发布新帖子</a>
+                    </div>
+                    <ul class="list-group mt-3">
+                        <li class="list-group-item">
+                            <h5 class="font-weight-bold">新加入会员</h5>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:profile' %}">设置</a>
+                        {% new_members as new_member_list %}
+                        {% for member in new_member_list %}
+                            <li class="list-group-item">
+                                <div class="media w-100">
+                                    <a href="{{ member.get_absolute_url }}">
+                                        <img class="d-flex mr-2 mugshot-24 rounded"
+                                             src="{{ member.mugshot_url }}" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <h6 class="mt-0">
+                                            <a class="small text-muted"
+                                               href="{{ member.get_absolute_url }}">
+                                                {{ member.nickname }}
+                                            </a>
+                                        </h6>
+                                        <div class="small text-muted">第 {{ member.pk }}
+                                            号会员，加入于 {{ member.date_joined }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">暂无帖子</li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="list-group mt-3">
+                        <li class="list-group-item">
+                            <h5 class="font-weight-bold">热门讨论</h5>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_logout' %}?next={{ request.path }}">登出</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_signup' %}?next={{ request.path }}">注册</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
-                        </li>
-                    {% endif %}
+                        {% get_popular_posts as popular_post_list %}
+                        {% for post in popular_post_list %}
+                            <li class="list-group-item">
+                                <div class="media w-100">
+                                    <a href="{{ post.author.get_absolute_url }}">
+                                        <img class="d-flex mr-2 mugshot-24 rounded"
+                                             src="{{ post.author.mugshot_url }}" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <h6 class="mt-0">
+                                            <a class="post-title"
+                                               href="{{ post.get_absolute_url }}">
+                                                {{ post.title }}
+                                            </a>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">暂无帖子</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="card card-block mt-3">
+                        <div>
+                            <i class="fa fa-rss mr-2" aria-hidden="true"></i>通过 <a href="/all/rss/">RSS</a> 或 <a
+                                href="/all/atom/">Atom</a> 订阅
+                        </div>
+                    </div>
+                </aside>
+            {% endblock aside %}
+        {% endblock content %}
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/tether/1.4.0/js/tether.min.js"></script>
+<script src="{% static 'forum/js/bootstrap.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        // 给表单非隐藏的 input 标签添加 Bootstrap 需要的 form-control 样式
+        $("form .form-group :input[type!=hidden]").addClass('form-control');
+        $("form .form-group :input[type=button]").removeClass('form-control');
+        $("form .form-group :input[type=checkbox]").removeClass('form-control');
+
+        // 预览
+        $('#js-preview').on('click', function (e) {
+            var $this = $(this);
+            var $textarea = $this.parents('form').find('textarea');
+            $.post('/ajax/preview/', {
+                    'content': $textarea.val()
+                }, function (data) {
+                    $textarea.hide();
+                    $('#js-preview-area').text('').append(data.preview).css(
+                        {'min-height': $textarea.height()}
+                    ).addClass('rounded bg-faded p-2').show()
+                }
+            );
+            return false
+        });
+
+        // 编辑
+        $('#js-edit').on('click', function (e) {
+            var $this = $(this);
+            $('#js-preview-area').hide();
+            $this.parents('form').find('textarea').show().focus();
+            return false
+        })
+    });
+
+
+    //百度链接自动推送脚本代码
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+
+    // 百度统计脚本代码
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?537d8be6a7994e059f726517533c7045";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+{% block script %}
+{% endblock script %}
+<footer class="bg-white mt-3 py-2">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="text-muted mb-3"><span class="py font-weight-bold">Python</span><span
+                        class="zhch font-weight-bold">zhcn</span> - Python 中文社区，我们将致力于打造国内最好的 Python 开发者社区！
+                </div>
+                <small class="text-muted">Powered by <a class="small" href="https://www.djangoproject.com/"
+                                                        target="_blank">Django</a>
+                </small>
+                <div class="w-100"></div>
+                <small class="text-muted">Designed by <a class="small" href="http://zmrenwu.com/"
+                                                         target="_blank">追梦人物</a></small>
+            </div>
+            <div class="col-md-4">
+                <ul class="list-unstyled list-inline d-flex justify-content-between">
+                    <li class="list-inline-item font-weight-bold mr-3"><a href="{% url 'forum:about' %}">关于</a></li>
+                    <li class="list-inline-item font-weight-bold mr-3"><a href="http://pythonzh.cn/post/16/">使用指南</a>
+                    </li>
+                    <li class="list-inline-item font-weight-bold"><a href="{% url 'forum:contact' %}">联系我们</a></li>
+                    <li class="list-inline-item font-weight-bold"><a href="{% url 'forum:donate' %}">捐赠</a></li>
+                    {% comment %}
+                    <li class="list-inline-item font-weight-bold"><a href="">常见问题</a></li>
+                    {% endcomment %}
                 </ul>
             </div>
         </div>
-    </nav>
-    <div class="container">
-        {% block content %}
-            <div class="row">
-                {% block main %}
-                {% endblock main %}
-                {% block aside %}
-                    <aside class="col-md-4">
-                        {% if request.user.is_authenticated %}
-                            <ul class="list-group mb-2">
-                                <li class="list-group-item">
-                                    <div class="media">
-                                        <a class="media-left" href="{{ request.user.get_absolute_url }}">
-                                            <img class="media-object" src="{{ request.user.mugshot_thumbnail.url }}"
-                                                 alt=""
-                                                 style="width: 48px;">
-                                        </a>
-                                        <div class="media-body media-middle">
-                                            <a href="{{ request.user.get_absolute_url }}">{{ request.user.nickname }}</a>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'forum:create' %}"><i class="fa fa-pencil" aria-hidden="true"></i>
-                                        发布新帖子</a>
-                                </li>
-                                <li class="list-group-item">
-                                    {% notifications_unread as unread_count %}
-                                    <a href="{% url 'forum:all' %}"
-                                       {% if unread_count %}style="color: red"{% endif %}><i
-                                            class="fa fa-bell"
-                                            aria-hidden="true"></i> {{ unread_count }} 条未读提醒</a>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'users:favorite' %}"><i class="fa fa-star"
-                                                                            aria-hidden="true"></i>
-                                        收藏列表</a>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'users:watch' request.user.username %}"><i class="fa fa-heart"
-                                                                                               aria-hidden="true"></i>
-                                        我喜欢的帖子</a>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'users:praise' request.user.username %}"><i class="fa fa-thumbs-up"
-                                                                                                aria-hidden="true"></i>
-                                        我赞过的回复</a>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'users:follows' request.user.username %}"><i class="fa fa-users"
-                                                                                                 aria-hidden="true"></i>
-                                        我关注的人</a>
-                                </li>
-                                <li class="list-group-item">
-                                    <a href="{% url 'users:feed' %}"><i class="fa fa-feed"
-                                                                        aria-hidden="true"></i>
-                                        我关注的动态</a>
-                                </li>
-                            </ul>
-                        {% else %}
-                            <div class="card card-block">
-                                <h3 class="card-title">django forum demo</h3>
-                                <hr>
-                                <div class="text-lg-center">
-                                    <button class="btn btn-outline-info btn-sm"><a
-                                            href="{% url 'account_signup' %}?next={{ request.path }}">现在注册</a></button>
-                                    <p>
-                                        已注册用户请<a href="{% url 'account_login' %}?next={{ request.path }}">登录</a>
-                                    </p>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <h3 class="list-group-item-heading">今日热门帖子</h3>
-                            </li>
-                            {% get_popular_posts as popular_post_list %}
-                            {% for post in popular_post_list %}
-                                <li class="list-group-item">
-                                    <div class="media">
-                                        <a class="media-left" href="{{ post.author.get_absolute_url }}">
-                                            <img class="media-object" src="{{ post.author.mugshot_thumbnail.url }}"
-                                                 alt=""
-                                                 style="width: 24px;">
-                                        </a>
-                                        <div class="media-body">
-                                            <h6 class="media-heading"><a
-                                                    href="{{ post.get_absolute_url }}">{{ post.title }}</a></h6>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </aside>
-                {% endblock aside %}
-            </div>
-        {% endblock content %}
+        <div class="text-center small text-muted mt-3">
+            <span>Copyright © 2017 <a href="http://www.pythonzh.cn">Pythonzhcn</a></span>
+            <div class="w-100 mt-1"></div>
+            <span>蜀ICP备16036143号-2</span>
+        </div>
     </div>
-
-</header>
-<script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
-<script src="//cdn.bootcss.com/tether/1.4.0/js/tether.min.js"></script>
-{#<script src="{% static 'forum/js/bootstrap.min.js' %}"></script>#}
-<script src="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js"></script>
-{% block script %}
-{% endblock script %}
+</footer>
 </body>
 </html>

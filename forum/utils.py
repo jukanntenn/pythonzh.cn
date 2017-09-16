@@ -2,26 +2,45 @@ import re
 import bleach
 import markdown
 
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
+from markdown.extensions.toc import TocExtension
+
+from django.utils.text import slugify
 
 from users.models import User
 
-bleach_args = {}
-possible_settings = {
-    'BLEACH_ALLOWED_TAGS': 'tags',
-    'BLEACH_ALLOWED_ATTRIBUTES': 'attributes',
-    'BLEACH_ALLOWED_STYLES': 'styles',
-    'BLEACH_STRIP_TAGS': 'strip',
-    'BLEACH_STRIP_COMMENTS': 'strip_comments',
+BLEACH_ALLOWED_TAGS = ['p', 'pre', 'blockquote', 'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'figure', 'figcaption', 'hr', 'a',
+                       'em', 'strong', 'cite', 'q', 'dfn', 'abbr', 'time', 'code', 'br', 'i', 'b', 'u', 's', 'sub',
+                       'sup',
+                       'ins', 'del', 'img', 'table', 'tr', 'td', 'th', 'caption', 'tbody', 'thead', 'tfoot', 'colgroup',
+                       'col',
+                       'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'acronym', 'span']
+
+BLEACH_ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title'],
+    'abbr': ['title'],
+    'acronym': ['title'],
+    'span': ['class'],
+    '*': ['id'],
+    'img': ['src'],
 }
 
-markdown_extensions = settings.MARKDOWN_EXTENSIONS
-markdown_extension_configs = settings.MARKDOWN_EXTENSION_CONFIGS
+MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.tables',
+    'markdown.extensions.codehilite',
+    TocExtension(slugify=slugify),
+]
 
-for setting, kwarg in possible_settings.items():
-    if hasattr(settings, setting):
-        bleach_args[kwarg] = getattr(settings, setting)
+MARKDOWN_EXTENSION_CONFIGS = {}
+
+
+def bleach_value(value, tags=BLEACH_ALLOWED_TAGS, attributes=BLEACH_ALLOWED_ATTRIBUTES):
+    return bleach.clean(value, tags=tags, attributes=attributes)
+
+
+def markdown_value(value, extensions=MARKDOWN_EXTENSIONS,
+                   extension_configs=MARKDOWN_EXTENSION_CONFIGS, *args, **kwargs):
+    return markdown.markdown(value, extensions=extensions, extension_configs=extension_configs, *args, **kwargs)
 
 
 def _pk_to_nickname(mo):
@@ -32,16 +51,3 @@ def _pk_to_nickname(mo):
 
 def parse_nicknames(value):
     return re.sub(r'@\[([0-9]+)\]\(', _pk_to_nickname, value)
-
-
-def mark(value, extensions=markdown_extensions, extension_configs=markdown_extension_configs,
-         *args, **kwargs):
-    return markdown.markdown(value, extensions=extensions, extension_configs=extension_configs, *args, **kwargs)
-
-
-def bleach_value(value):
-    return bleach.clean(value, **bleach_args)
-
-
-def get_ctype_pk(obj):
-    return ContentType.objects.get_for_model(obj).pk

@@ -7,6 +7,7 @@ from django.core import urlresolvers
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from allauth.socialaccount.models import SocialAccount
 
 from .mugshot import Avatar
 
@@ -25,7 +26,7 @@ class User(AbstractUser):
     mugshot_thumbnail = ImageSpecField(source='mugshot',
                                        processors=[ResizeToFill(96, 96)],
                                        format='JPEG',
-                                       options={'quality': 80})
+                                       options={'quality': 100})
 
     def __str__(self):
         return self.username
@@ -44,4 +45,13 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return urlresolvers.reverse('users:detail', args=(self.username,))
+        return urlresolvers.reverse('users:detail', args=(self.pk,))
+
+    def mugshot_url(self):
+        mugshot_name = self.mugshot.name.rsplit('/', 1)[-1]
+        if mugshot_name == 'default_mugshot.png':
+            # 首先尝试从社交账户中获取头像
+            if self.socialaccount_set.exists():
+                return self.socialaccount_set.first().get_avatar_url()
+
+        return self.mugshot_thumbnail.url

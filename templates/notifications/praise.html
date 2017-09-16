@@ -1,22 +1,16 @@
+{% extends 'notifications/base.html' %}
 {% load forum_tags %}
-
-<div class="media">
-    <a class="media-left" href="{{ actor.get_absolute_url }}">
-        <img class="media-object" src="{{ actor.mugshot_thumbnail.url }}"
-             alt="" style="width: 24px;">
+{% block description %}
+    <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
+    赞了你在
+    <a class="js-read" data-state="{% if notification.unread %}1{% else %}0{% endif %}"
+       href="{{ target.content_object.get_absolute_url }}#c{{ target.pk }}">
+        {{ target.content_object.title }}
     </a>
-    <div class="media-body">
-        <div class="media-heading">
-            用户 <a href="{{ actor.get_absolute_url }}">{{ actor.nickname }}</a>
-            赞了你在帖子
-            <a href="{{ target.content_object.get_absolute_url }}#c{{ target.pk }}"
-               data-state="{% if notification.unread %}1{% else %}0{% endif %}"
-               data-target="{% url 'notifications:mark_as_read' notification.slug %}" class="notification-jump">
-                {{ target.content_object.title }}</a>
-            中的回复
-            <div class="mark">
-                {{ target.comment|parse_nicknames|mark|bleach }}
-            </div>
-        </div>
+    的回复
+{% endblock description %}
+{% block reply %}
+    <div class="mark py-1 mt-1 small">
+        {{ target.comment|parse_nicknames|mark|bleach|safe }}
     </div>
-</div>
+{% endblock reply %}

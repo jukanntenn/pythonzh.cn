@@ -1,22 +1,35 @@
-{% extends "base.html" %}
-
-{% load crispy_forms_tags %}
-
+{% extends "account/base.html" %}
+{% block title %}登录 - Pythonzhcn{% endblock title %}
 {% block main %}
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header"><a href="{% url 'forum:index' %}">django forum demo</a> > <span>登录</span></div>
+        <div class="card mt-3">
+            <div class="card-header h5 font-weight-bold bg-primary text-white">登录</div>
             <div class="card-block">
-                {% crispy form %}
-                <a href="{% url 'account_reset_password' %}">我忘记密码了？</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">其他登录方式</div>
-            <div class="card-block">
-                <p class="card-text">第三方登录功能正在开发中...</p>
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <form action="{% url 'account_login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.login }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.remember }}
+                        {{ form.remember.label_tag }} (30 天)
+                    </div>
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}"
+                               value="{{ redirect_field_value }}"/>
+                    {% endif %}
+                    <button class="btn btn-primary btn-sm" type="submit">登录</button>
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{% url 'account_signup' %}">新用户注册</a>
+                        <a href="{% url 'account_reset_password' %}">忘记密码？</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

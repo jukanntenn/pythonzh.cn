@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% block aside %}
+    <div class="col-md-4">
+        <div class="card mt-3">
+            <div class="card-header h5 font-weight-bold bg-primary text-white">第三方账号登录</div>
+            <div class="card-block">
+                <a class="btn btn-outline-info btn-block h3" href="{% provider_login_url 'github' %}" role="button">
+                    <i class="fa fa-github mr-2" aria-hidden="true"></i>GitHub
+                </a>
+                {% comment %}
+                <a class="btn btn-outline-primary btn-block mt-3 h3" href="{% provider_login_url 'google' %}">
+                    <i class="fa fa-google mr-2" aria-hidden="true"></i>Google
+                </a>
+                <button class="btn btn-outline-warning btn-block mt-3 h3">
+                    <a href="{% provider_login_url 'weibo' %}">
+                        <i class="fa fa-weibo mr-2" aria-hidden="true"></i>新浪微博
+                    </a>
+                </button>
+                {% endcomment %}
+            </div>
+        </div>
+    </div>
+{% endblock aside %}
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            // 刷新验证码
+            $('img.captcha').on('click', function () {
+                var $form = $(this).parents('form');
+
+                $.getJSON('/captcha/refresh/', {}, function (json) {
+                    $form.find('input[name="captcha_0"]').val(json.key);
+                    $form.find('img.captcha').attr('src', json.image_url);
+                });
+
+                return false;
+            });
+        });
+    </script>
+{% endblock script %}

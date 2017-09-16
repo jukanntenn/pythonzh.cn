@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}取消社交账户关联成功.{% endblocktrans %}

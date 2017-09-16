@@ -1,0 +1,2 @@
+请点击下方的链接以激活你的 Pythonzhcn 账号
+{{ activate_url }}

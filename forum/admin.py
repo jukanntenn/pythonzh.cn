@@ -7,7 +7,8 @@ from .models import Post
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
-    list_display = ('title', 'created', 'modified', 'views', 'pinned', 'category', 'author', 'is_visible')
+    list_display = ('title', 'created', 'modified', 'views', 'category', 'author',
+                    'pinned', 'highlighted', 'is_visible')
 
     def is_visible(self, obj):
         return not obj.is_removed

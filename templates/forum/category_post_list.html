@@ -2,14 +2,192 @@
 
 {% load staticfiles %}
 {% load crispy_forms_tags %}
-
+{% load forum_tags %}
+{% load comments %}
+{% block title %}{{ category }} - Pythonzhcn{% endblock title %}
 {% block main %}
     <main class="col-md-8 mb-1">
-        {% include 'forum/_category_post_list.html' %}
-        <div class="card card-block mt-2">
-            <h6 class="">在 <strong>{{ category }}</strong> 分类下快速发布帖子</h6>
-            <hr>
-            {% crispy form %}
+        <ul class="list-group mt-3">
+            <li class="list-group-item">
+                <div class="row no-gutters w-100">
+                    <div class="col-auto">
+                        <img class="cover-72 rounded hidden-sm-down" src="{{ category.cover.cover_thumbnail.url }}"
+                             alt="">
+                        <img class="cover-36 rounded hidden-md-up" src="{{ category.cover.cover_thumbnail.url }}"
+                             alt="">
+                    </div>
+                    <div class="col mx-3">
+                        <nav class="breadcrumb m-0 p-0 bg-white">
+                            <a class="breadcrumb-item" href="{% url 'forum:index' %}">Pythonzhcn</a>
+                            {% for category in category_ancestors %}
+                                <a class="breadcrumb-item"
+                                   href="{% url 'forum:category_posts' category.slug %}">{{ category }}</a>
+                            {% endfor %}
+                            <span class="breadcrumb-item active">{{ category }}</span>
+                        </nav>
+                        <div class="text-muted small mt-2">
+                            {{ category.description }}
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary mt-3"><a
+                                href="{% url 'forum:create' category.slug %}">发布新帖子</a>
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <span class="text-muted small">帖子总数 {{ post_list.count }}</span>
+                    </div>
+                </div>
+            </li>
+            {% if category.children.count %}
+                <li class="list-group-item">
+                    <ul class="list-inline mb-2">
+                        <li class="list-inline-item"><span class="small bg-primary text-white py-1 px-2 mr-2">全部</span>
+                        </li>
+                        {% for c in category.children.all %}
+                            <li class="list-inline-item"><a href="{% url 'forum:category_posts' c.slug %}"
+                                                            class="bg-faded small py-1 px-2 mr-2">{{ c }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+            {% for post in post_list %}
+                <li class="list-group-item">
+                    <div class="media w-100">
+                        <a href="{{ post.author.get_absolute_url }}">
+                            <img class="d-flex mr-2 mugshot-48 rounded hidden-xs-down"
+                                 src="{{ post.author.mugshot_url }}"
+                                 alt="">
+                            <img class="d-flex mr-2 mugshot-24 rounded hidden-sm-up" src="{{ post.author.mugshot_url }}"
+                                 alt="">
+                        </a>
+                        <div class="media-body">
+                            <ul class="list-unstyled list-inline small mt-0 list-dot-divider">
+                                {% if post.pinned %}
+                                    <li class="list-inline-item m-0 pinned">顶</li>
+                                {% endif %}
+                                {% if post.highlighted %}
+                                    <li class="list-inline-item m-0 highlight">精</li>
+                                {% endif %}
+                                {% comment %}
+                                <li class="list-inline-item m-0">热</li>
+                                {% endcomment %}
+                                <li class="list-inline-item m-0">
+                                    <a class="text-muted"
+                                       href="{{ post.author.get_absolute_url }}">{{ post.author.nickname }}</a>
+                                </li>
+                                <li class="list-inline-item m-0 bg-faded px-1">
+                                    <a href="{% url 'forum:category_posts' post.category.slug %}">{{ post.category }}</a>
+                                </li>
+                            </ul>
+                            <h6 class="mt-1">
+                                <a class="post-title" href="{{ post.get_absolute_url }}">
+                                    {{ post.title }}
+                                </a>
+                            </h6>
+                            {% get_comment_count for post as reply_count %}
+                            <ul class="list-unstyled list-inline text-muted small">
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="{{ post.get_absolute_url }}">
+                                        <time datetime="{{ post.created }}">{{ post.created|timeago }}</time>
+                                    </a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="{{ post.get_absolute_url }}">{{ post.views }} 次点击</a>
+                                </li>
+                                <li class="list-inline-item hidden-md-up">{{ reply_count }} 回复</li>
+                            </ul>
+                        </div>
+                        {% if reply_count %}
+                            <div class="d-flex align-self-center ml-3 hidden-sm-down">
+                                <a href="" class="badge badge-pill badge-default">{{ reply_count }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+            {% if is_paginated %}
+                <li class="list-group-item">
+                    <nav aria-label="Page navigation example" class="w-100">
+                        <ul class="pagination pagination-sm justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if first %}
+                                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                            {% endif %}
+                            {% if left %}
+                                {% if left_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                                {% for i in left %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link"
+                                                            href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+                            </li>
+                            {% if right %}
+                                {% for i in right %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                                {% if right_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                            {% endif %}
+                            {% if last %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a>
+                                </li>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </li>
+            {% endif %}
+        </ul>
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">在 <strong>{{ category }}</strong> 分类下快速发布帖子</div>
+            <div class="card-block">
+                <form class="form" action="{% url 'forum:create' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {{ form.title.errors }}
+                        <small class="text-muted">{{ form.title.help_text }}</small>
+                    </div>
+                    <div class="form-group">
+                        {{ form.body.label_tag }}
+                        <div>
+                            <button type="button" class="btn btn-sm mr-2 bg-faded" id="js-edit">编辑</button>
+                            <button type="button" class="btn btn-sm bg-faded" id="js-preview">预览</button>
+                        </div>
+                        {{ form.body }}
+                        {{ form.body.errors }}
+                        <div class="preview-area p-1" id="js-preview-area"></div>
+                        <span class="text-muted small">支持 Markdown 语法<i class="fa fa-question-circle ml-2"
+                                                                        aria-hidden="true"></i></span>
+                    </div>
+                    {{ form.category }}
+                    <button class="btn btn-primary btn-sm float-right" type="submit"><i
+                            class="fa fa-paper-plane mr-2"
+                            aria-hidden="true"></i>发表
+                    </button>
+                </form>
+            </div>
         </div>
     </main>
 {% endblock main %}

@@ -1,28 +1,27 @@
 import re
 import datetime
 
+import timeago
+
 from django import template
-from django.db.models import Count, DateTimeField
+from django.db.models import Count
 from django.conf import settings
-from django.utils.html import mark_safe
 from django.db.models import Max
-from django.db.models.functions import Coalesce
 from django.utils.timezone import now, timedelta
 from django.template.loader import render_to_string
-from django.contrib.contenttypes.models import ContentType
+
+from actstream.models import Follow
 
 from categories.models import Category
+from users.models import User
 from ..models import Post
-from ..utils import parse_nicknames, bleach_value, mark, get_ctype_pk
+from ..utils import parse_nicknames, bleach_value, markdown_value
 
 register = template.Library()
 
 register.filter('bleach', bleach_value)
-register.filter('mark', mark)
+register.filter('mark', markdown_value)
 register.filter('parse_nicknames', parse_nicknames)
-register.filter('get_ctype_pk', get_ctype_pk)
-
-register.simple_tag(get_ctype_pk, name='get_ctype_pk')
 
 
 @register.simple_tag
@@ -40,7 +39,7 @@ def get_popular_posts():
 
 @register.simple_tag
 def get_categories():
-    return Category.objects.filter(parent__isnull=True)
+    return Category.objects.filter(show=True).order_by('rank')
 
 
 @register.simple_tag
@@ -61,27 +60,50 @@ def describe(obj):
     return render_to_string(tmpl, context=context)
 
 
-@register.filter
-def action(obj):
-    verb = obj.verb
-    tmpl = getattr(settings, 'ACTION_TEMPLATES')[verb]
-    context = {
-        'actor': obj.actor,
-        'target': obj.target,
-        'action_object': obj.action_object,
-        'timestamp': obj.timestamp
-    }
-    return render_to_string(tmpl, context=context)
+@register.simple_tag
+def get_follow_count(obj, follow_type=None):
+    return Follow.objects.followers_qs(actor=obj, follow_type=follow_type).count()
 
 
-@register.filter
-def feed(obj):
-    verb = obj.verb
-    tmpl = getattr(settings, 'FEED_TEMPLATES')[verb]
-    context = {
-        'actor': obj.actor,
-        'target': obj.target,
-        'action_object': obj.action_object,
-        'timestamp': obj.timestamp
-    }
-    return render_to_string(tmpl, context=context)
+@register.simple_tag
+def get_user_total_praised(user):
+    replies = user.reply_comments.all()
+    total = 0
+
+    for reply in replies:
+        total += Follow.objects.followers_qs(reply, follow_type='praise').count()
+
+    return total
+
+
+@register.simple_tag
+def get_user_total_recommended(user):
+    posts = user.post_set.all()
+    total = 0
+
+    for post in posts:
+        total += Follow.objects.followers_qs(post, follow_type='recommend').count()
+
+    return total
+
+
+@register.simple_tag
+def get_user_total_favorited(user):
+    posts = user.post_set.all()
+    total = 0
+
+    for post in posts:
+        total += Follow.objects.followers_qs(post, follow_type='favorite').count()
+
+    return total
+
+
+@register.simple_tag
+def new_members(num=5):
+    return User.objects.order_by('-date_joined')[:num]
+
+
+@register.filter("timeago")
+def timeago_filter(value):
+    now_ = now()
+    return timeago.format(value, now_, 'zh_CN')

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load account %}
+
+{% block title %}确认邮箱地址 - Pythonzhcn{% endblock title %}
+
+
+{% block content %}
+    <h1 class="mt-3 w-100">{% trans "Confirm E-mail Address" %}</h1>
+
+    {% if confirmation %}
+        <div>
+            {% user_display confirmation.email_address.user as user_display %}
+
+            <p>{% blocktrans with confirmation.email_address.email as email %}请确认
+                <a href="mailto:{{ email }}">{{ email }}</a> 是用户 {{ user_display }} 的邮箱地址
+                。{% endblocktrans %}</p>
+
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                {% csrf_token %}
+                <button class="btn btn-primary btn-sm" type="submit">{% trans 'Confirm' %}</button>
+            </form>
+
+            {% else %}
+
+            {% url 'account_email' as email_url %}
+
+            <p>{% blocktrans %}This e-mail confirmation link expired or is invalid. Please
+                <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.{% endblocktrans %}</p>
+        </div>
+    {% endif %}
+{% endblock %}

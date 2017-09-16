@@ -1,7 +1,159 @@
 {% extends 'base.html' %}
-
+{% load comments %}
+{% load forum_tags %}
+{% block title %}
+    {% if category %}
+        {{ category }} - Pythonzhcn
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock title %}
 {% block main %}
-    <main class="col-md-8 mb-1">
-        {% include 'forum/_index.html' %}
+    <main class="col-md-8">
+        <ul class="list-group mt-3">
+            <li class="list-group-item py-2">
+                {% get_categories as category_list %}
+                <ul class="list-unstyled list-inline">
+                    <li class="list-inline-item mb-1 mr-1"><a
+                            class="{% if request.path == '/' %}bg-primary text-white{% endif %} py-1 px-1 small"
+                            href="{% url 'forum:index' %}">全部</a>
+                    </li>
+                    {% for c in category_list %}
+                        <li class="list-inline-item mb-1 mr-1"><a
+                                class="bg-faded py-1 px-1 small {% if category.name == c.name %}bg-primary text-white{% endif %}"
+                                href="{% url 'forum:category_posts' c.slug %}">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% if category_children %}
+                <li class="list-group-item py-2 bg-faded">
+                    <ul class="list-unstyled list-inline">
+                        {% for c in category_children %}
+                            <li class="list-inline-item"><a
+                                    class="small"
+                                    href="{% url 'forum:category_posts' c.slug %}">{{ c }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+            {% for post in post_list %}
+                <li class="list-group-item">
+                    <div class="media w-100">
+                        <a href="{{ post.author.get_absolute_url }}">
+                            <img class="d-flex mr-2 mugshot-48 rounded hidden-xs-down"
+                                 src="{{ post.author.mugshot_url }}"
+                                 alt="">
+                            <img class="d-flex mr-2 mugshot-24 rounded hidden-sm-up"
+                                 src="{{ post.author.mugshot_url }}"
+                                 alt="">
+                        </a>
+                        <div class="media-body">
+                            <ul class="list-unstyled list-inline small mt-0 list-dot-divider">
+                                {% if post.pinned %}
+                                    <li class="list-inline-item m-0 pinned">顶</li>
+                                {% endif %}
+                                {% if post.highlighted %}
+                                    <li class="list-inline-item m-0 highlight">精</li>
+                                {% endif %}
+                                {% comment %}
+                                <li class="list-inline-item m-0">热</li>
+                                {% endcomment %}
+                                <li class="list-inline-item m-0">
+                                    <a class="text-muted"
+                                       href="{{ post.author.get_absolute_url }}">{{ post.author.nickname }}</a>
+                                </li>
+                                <li class="list-inline-item m-0 bg-faded px-1">
+                                    <a href="{% url 'forum:category_posts' post.category.slug %}">{{ post.category }}</a>
+                                </li>
+                            </ul>
+                            <h6 class="mt-1">
+                                <a class="post-title" href="{{ post.get_absolute_url }}">
+                                    {{ post.title }}
+                                </a>
+                            </h6>
+                            {% get_comment_count for post as reply_count %}
+                            <ul class="list-unstyled list-inline text-muted small">
+                                <li class="list-inline-item m-0">
+                                    <a class="text-muted" href="{{ post.get_absolute_url }}">
+                                        <time datetime="{{ post.timestamp }}">{{ post.timestamp|timeago }}</time>
+                                    </a>
+                                </li>
+                                ·
+                                <li class="list-inline-item m-0">
+                                    <a class="text-muted" href="{{ post.get_absolute_url }}">{{ post.views }} 次点击</a>
+                                </li>
+                                <li class="list-inline-item hidden-md-up m-0">· <a class="text-muted"
+                                                                                   href="{{ post.get_absolute_url }}#comment-area">{{ reply_count }}
+                                    回复</a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% if reply_count %}
+                            <div class="d-flex align-self-center ml-3 hidden-sm-down">
+                                <a href="{{ post.get_absolute_url }}#comment-area"
+                                   class="badge badge-pill badge-default">{{ reply_count }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item">
+                    暂无帖子
+                </li>
+            {% endfor %}
+            {% if is_paginated %}
+                <li class="list-group-item">
+                    <nav aria-label="Page navigation example" class="w-100">
+                        <ul class="pagination pagination-sm justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if first %}
+                                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                            {% endif %}
+                            {% if left %}
+                                {% if left_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                                {% for i in left %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link"
+                                                            href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+                            </li>
+                            {% if right %}
+                                {% for i in right %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endfor %}
+                                {% if right_has_more %}
+                                    <li class="page-item"><span class="mx-3">...</span></li>
+                                {% endif %}
+                            {% endif %}
+                            {% if last %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a>
+                                </li>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </li>
+            {% endif %}
+        </ul>
     </main>
 {% endblock main %}

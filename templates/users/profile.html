@@ -1,61 +1,31 @@
-{% extends 'base.html' %}
+{% extends 'users/base.html' %}
 {% load staticfiles %}
-{% block main %}
-    <main class="col-md-8 mb-1">
-        <div class="card card-block">
-            <h3 class="card-title">个人资料
-                <small><a href="{% url 'users:profile_change' %}"><i class="fa fa-pencil-square-o"
-                                                                     aria-hidden="true"></i> 修改</a>
-                </small>
-            </h3>
-            <hr>
-            <ul class="list-unstyled">
-                <li class="mb-1">
-                    <strong>用户名：</strong>{{ user.username }}
-                </li>
-                <li class="mb-1">
-                    <strong>邮箱：</strong>
-                    <ul class="list-unstyled">
-                        {% for emailaddress in user.emailaddress_set.all %}
-                            <li>{{ emailaddress.email }}
-                                {% if emailaddress.verified %}
-                                    <span class="verified small">已验证</span>
-                                {% else %}
-                                    <span class="unverified small">未验证</span>
-                                {% endif %}
-                                {% if emailaddress.primary %}
-                                    <span class="primary small" style="color:red">主邮箱</span>{% endif %}</li>
+{% block title %}个人资料 - Pythonzhcn{% endblock title %}
+{% block card %}
+    <div class="card mt-3">
+        <div class="card-block">
+            <div class="row">
+                <div class="col">
+                    <form action="{% url 'users:settings' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {{ field.errors }}
+                            </div>
                         {% endfor %}
-                    </ul>
-                </li>
-                <li class="mb-1">
-                    <strong>昵称：</strong>{{ user.nickname }}
-                </li>
-                <li class="mb-1">
-                    <strong>个性签名：</strong>{{ user.signature|default:"这个人很懒，什么也没留下" }}
-                </li>
-            </ul>
-        </div>
-        <div class="card card-block">
-            <h3 class="card-title">头像上传</h3>
-            <hr>
-            <span>当前头像</span>
-            <img src="{{ user.mugshot_thumbnail.url }}" alt=""
-                 style="width: 96px;">
-            <div>
-                <button class="btn btn-outline-info btn-sm mt-1"><a href="{% url 'users:mugshot_change' %}">上传新头像</a>
-                </button>
+                        <button class="btn btn-primary btn-sm" type="submit">更新资料</button>
+                    </form>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ user.get_absolute_url }}">
+                        <img class="d-flex mx-3 mugshot-96 rounded hidden-md-down"
+                             src="{{ user.mugshot_url }}"
+                             alt="">
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="card card-block">
-            <h3 class="card-title">安全</h3>
-            <hr>
-            <ul class="list-unstyled">
-                <li><a href="{% url 'account_change_password' %}"><i class="fa fa-key" aria-hidden="true"></i> 修改密码</a>
-                </li>
-                <li><a href="{% url 'account_email' %}"><i class="fa fa-envelope" aria-hidden="true"></i> 修改绑定邮箱</a>
-                </li>
-            </ul>
-        </div>
-    </main>
-{% endblock main %}
+    </div>
+{% endblock card %}

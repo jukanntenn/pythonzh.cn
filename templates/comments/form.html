@@ -1,2 +1,24 @@
-{% load crispy_forms_tags %}
-{% crispy form %}
+{% load comments %}
+<form class="form" action="{% comment_form_target %}" method="post">
+    {% csrf_token %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    <input type="hidden" name="next" value="{% url 'replies:success' %}">
+    {{ form.honeypot }}
+    {{ form.comment.errors }}
+    <div class="form-group">
+        <button type="button" class="btn btn-sm mr-2 bg-faded" id="js-edit">编辑</button>
+        <button type="button" class="btn btn-sm bg-faded" id="js-preview">预览</button>
+        {{ form.comment }}
+        <div class="preview-area" id="js-preview-area"></div>
+    </div>
+    <a class="text-muted small" href="http://www.appinn.com/markdown/index.html" target="_blank">使用 Markdown 提供优雅排版<i
+            class="fa fa-question-circle ml-1"
+            aria-hidden="true"></i></a>
+    <button id="js-create" class="btn btn-primary btn-sm float-right" type="submit"><i
+            class="fa fa-paper-plane mr-2"
+            aria-hidden="true"></i>发表
+    </button>
+    <span class="small text-muted float-right mr-2">Ctrl/Command + 回车发表</span>
+</form>

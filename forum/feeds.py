@@ -5,12 +5,12 @@ from django.db.models import Max
 from django.utils.feedgenerator import Atom1Feed
 
 from .models import Post
-from .utils import mark
+from .utils import markdown_value
 from .templatetags.forum_tags import bleach_value
 
 
 class AllPostsRssFeed(Feed):
-    title = "django 测试论坛"
+    title = "Pythonzhcn 社区"
     link = "/"
     description = "首页的全部帖子"
 
@@ -24,7 +24,7 @@ class AllPostsRssFeed(Feed):
         return '[%s] %s' % (item.category, item.title)
 
     def item_description(self, item):
-        return bleach_value(mark(item.body))
+        return bleach_value(markdown_value(item.body))
 
 
 class AllPostsAtomFeed(AllPostsRssFeed):

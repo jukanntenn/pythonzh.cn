@@ -3,15 +3,18 @@ from django.conf import settings
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from simplemde.widgets import SimpleMDEEditor
 from pagedown.widgets import PagedownWidget
+from mptt.forms import TreeNodeChoiceField
 
+from categories.models import Category
 from .models import Post
 
 use_pagedown = getattr(settings, 'USE_PAGEDOWN')
 
 
 class PostCreationForm(forms.ModelForm):
+    category = TreeNodeChoiceField(queryset=Category.public.all())
+
     class Meta:
         model = Post
         fields = ('title', 'body', 'category',)
@@ -19,17 +22,9 @@ class PostCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
-        self.helper.form_action = 'forum:create'
-        self.helper.form_method = 'post'
-        self.helper.form_id = 'id_create_form'
-        self.helper.add_input(Submit('submit', '发布'))
-        # self.helper.include_media = False
-        # TODO: use Meta attribute
         self.fields['title'].label = '标题'
-        self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文'
+        self.fields['title'].help_text = '如果标题能够说明问题，可以不必填写正文。'
         self.fields['body'].label = '正文'
-        self.fields['body'].help_text = '支持 Markdown 语法标记'
         self.fields['category'].label = '分类'
         self.fields['category'].help_text = '选择帖子分类'
 
@@ -46,6 +41,8 @@ class PostCreationForm(forms.ModelForm):
 
 
 class PostEditForm(forms.ModelForm):
+    category = TreeNodeChoiceField(queryset=Category.public.all())
+
     class Meta:
         model = Post
         fields = ('title', 'body', 'category',)

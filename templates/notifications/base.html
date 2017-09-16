@@ -1,0 +1,39 @@
+{% load forum_tags %}
+<div class="row no-gutters w-100">
+    <div class="col-auto">
+        <a href="{{ actor.get_absolute_url }}">
+            <img class="d-flex mr-2 mugshot-48 rounded hidden-xs-down" src="{{ actor.mugshot_url }}" alt="">
+        </a>
+        <a href="{{ actor.get_absolute_url }}">
+            <img class="d-flex mr-2 mugshot-24 rounded hidden-sm-up" src="{{ actor.mugshot_url }}" alt="">
+        </a>
+    </div>
+    <div class="col">
+        <div class="row no-gutters">
+            <div class="col">
+                {% block description %}
+                {% endblock description %}
+            </div>
+            <div class="col-auto">
+                <time class="text-muted small ml-2 hidden-sm-down">{{ notification.timestamp|timeago }}</time>
+            </div>
+        </div>
+        {% block reply %}
+        {% endblock reply %}
+        <ul class="list-unstyled list-inline mt-2">
+            <li class="list-inline-item">
+                <time class="text-muted small ml-2 hidden-md-up">{{ notification.timestamp|timeago }}</time>
+            </li>
+            <li class="list-inline-item float-right">
+                <a class="bg-danger p-1 text-white small ml-2 rounded"
+                   href="{% url 'notifications:delete' notification.slug %}">删除</a>
+            </li>
+            {% if notification.unread %}
+                <li class="list-inline-item float-right">
+                    <a class="bg-primary p-1 text-white small rounded js-mark-as-read"
+                       href="{% url 'notifications:mark_as_read' notification.slug %}">标为已读</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
