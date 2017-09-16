@@ -20,13 +20,13 @@ http://pythonzh.cn
    在命令行进入到保存虚拟环境的文件夹，输入如下命令创建并激活虚拟环境：
 
    ```
-   virtualenv blogproject_env
+   virtualenv pythonzhcn_env
 
    # windows
-   blogproject_env\Scripts\activate
+   pythonzhcn_env\Scripts\activate
 
    # linux
-   source blogproject_env/bin/activate
+   source pythonzhcn_env/bin/activate
    ```
 
 3. 安装项目依赖
