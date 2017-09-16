@@ -157,7 +157,7 @@ class PostEditView(LoginRequiredMixin, UpdateView):
 
 
 class NotificationsListView(PaginationMixin, AllNotificationsList):
-    paginate_by = 20
+    paginate_by = 25
     paginate_orphans = 5
 
 
